@@ -1,0 +1,16 @@
+# Visual Studio temp files
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# NuGet packages
+*.nupkg
+packages/
