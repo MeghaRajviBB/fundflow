@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FundFlow NXT — Progress Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; background: #f8fafc; color: #1e293b; }
+    h1 { color: #0d9488; }
+    .day-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .date-badge { background: #0d9488; color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; }
+    .section { margin-top: 16px; }
+    .section h2 { font-size: 15px; color: #0f2645; margin-bottom: 8px; }
+    .highlight { background: #f0fdf4; border-left: 3px solid #059669; padding: 10px 14px; border-radius: 6px; }
+    .day-chip { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th { background: #0f2645; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 6px; font-size: 14px; }
+    a { color: #0d9488; }
+  </style>
+</head>
+<body>
+
+<h1>🏦 FundFlow NXT — Daily Progress Tracker</h1>
+<p>6-Week Fresher POC | Blackbaud FinancialEdge NXT Team</p>
+
+<!-- TABLE OF CONTENTS -->
+<div class="day-card">
+  <h2>📋 Table of Contents</h2>
+  <ul id="toc">
+    <li><a href="#day1">Day 1 — 2026-07-07 | Project Setup + GL + Treasury APIs</a></li>
+    <li><a href="#day2">Day 2 — 2026-07-08 | Accounts Payable Controller + Aging Report</a></li>
+  </ul>
+</div>
+
+<!-- SPRINT MAPPING TABLE -->
+<div class="day-card">
+  <h2>🎯 Sprint Mapping</h2>
+  <table>
+    <tr><th>Story</th><th>Description</th><th>Status</th><th>Day/Date</th></tr>
+    <tr><td>1.1</td><td>Create GitHub repo and folder structure</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
+    <tr><td>1.2</td><td>Configure Git and push first commit</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
+    <tr><td>3.1</td><td>Create ASP.NET Core Web API project</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
+    <tr><td>3.2</td><td>Build General Ledger controller</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
+    <tr><td>3.3</td><td>Build Treasury controller with bulk clearing</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
+    <tr><td>3.4</td><td>Build Accounts Payable controller</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
+    <tr><td>2.1</td><td>Create Angular project</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>2.2</td><td>Build journal entry list page</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>4.1</td><td>Set up SQL Server</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>5.1</td><td>Deploy to Azure App Service</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>5.2</td><td>Add AI anomaly detection</td><td>⬜ Backlog</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- DAY 1 -->
+<div class="day-card" id="day1">
+  <span class="date-badge">📅 2026-07-07</span>
+  <h2>🚀 Day 1 — Project Setup + GL + Treasury APIs</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Created GitHub repository — fundflow</li>
+      <li>✅ Set up Git config, cloned repo, created folder structure</li>
+      <li>✅ Created ASP.NET Core Web API project — FundFlowNXT.API</li>
+      <li>✅ Built JournalEntry model and controller — GL module with debit=credit validation</li>
+      <li>✅ Built BankTransaction model and TreasuryController — with bulk clearing endpoint</li>
+      <li>✅ Configured Swagger, CORS, installed Swashbuckle package</li>
+      <li>✅ GL and Treasury controllers tested and working in Swagger UI</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Access modifiers — public vs private vs protected and why API properties must be public</li>
+      <li>✔ ActionResult and why it wraps responses with HTTP status codes</li>
+      <li>✔ LINQ — FirstOrDefault, Where, Sum, Count for filtering and aggregating data</li>
+      <li>✔ HTTP verbs — GET for fetching, POST for creating, PUT for updating</li>
+      <li>✔ Attributes — [ApiController], [HttpGet], [Route] and what they do</li>
+      <li>✔ Why CORS exists and how to configure it in Program.cs</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ Git not installed — showed "not recognized" error</li>
+      <li>✅ Installed Git from git-scm.com and reconfigured</li>
+      <li>❌ Swagger page not found on first run — .NET 10 uses different setup</li>
+      <li>✅ Installed Swashbuckle.AspNetCore package and updated Program.cs</li>
+      <li>❌ Git permission error on .vs folder</li>
+      <li>✅ Added .gitignore to exclude Visual Studio temp files</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Build Accounts Payable controller with approval workflow</li>
+      <li>➡ Start Angular frontend — Week 2 learning plan</li>
+      <li>➡ Discuss dev database access with Satya</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">Built a fully working ASP.NET Core Web API with GL and Treasury controllers — General Ledger with debit=credit validation, Treasury with bulk transaction clearing that fixes a real FE NXT pain point. Both tested in Swagger and pushed to GitHub.</p>
+  </div>
+</div>
+
+<!-- DAY 2 -->
+<div class="day-card" id="day2">
+  <span class="date-badge">📅 2026-07-08</span>
+  <h2>🧾 Day 2 — Accounts Payable Controller + Aging Report</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Built Invoice model — VendorName, Amount, InvoiceDate, DueDate, Status, IsOverdue computed property</li>
+      <li>✅ Built AccountsPayableController with full CRUD and workflow endpoints</li>
+      <li>✅ GET /api/AccountsPayable — list all invoices</li>
+      <li>✅ GET /api/AccountsPayable/overdue — filter invoices past due date</li>
+      <li>✅ GET /api/AccountsPayable/status/{status} — filter by Pending / Approved / Paid</li>
+      <li>✅ POST /api/AccountsPayable — create new invoice (auto-sets status to Pending)</li>
+      <li>✅ PUT /api/AccountsPayable/{id}/approve — approve a pending invoice</li>
+      <li>✅ PUT /api/AccountsPayable/{id}/pay — mark approved invoice as paid</li>
+      <li>✅ GET /api/AccountsPayable/aging — aging report with totals by status and overdue breakdown</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Computed properties in C# — IsOverdue uses get { return ... } to derive value from DueDate</li>
+      <li>✔ Multi-step workflow enforcement — approve before pay, guard clauses with BadRequest</li>
+      <li>✔ Anonymous objects — returning shaped JSON without creating a separate class</li>
+      <li>✔ LINQ .Where, .Count, .Sum chained together to build an aging report in one block</li>
+      <li>✔ Route parameters — {id}/approve pattern to action on a specific resource</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ Invoice model not in Models folder — had to create it separately as untracked file</li>
+      <li>✅ Added Invoice.cs to backend/FundFlowNXT.API/Models/ and wired up correctly</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Commit AccountsPayableController and Invoice model to GitHub</li>
+      <li>➡ Build Grants and Budgeting controllers</li>
+      <li>➡ Start Angular frontend — Week 2 learning plan</li>
+      <li>➡ Discuss dev database access with Satya</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">Built the Accounts Payable module with a complete 3-stage approval workflow (Pending → Approved → Paid), overdue detection, status filtering, and an aging report endpoint — all in a single controller. Mirrors real-world AP processes used in FinancialEdge NXT.</p>
+  </div>
+</div>
+
+<!-- Future days will be appended above this comment -->
+
+</body>
+</html>
