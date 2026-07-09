@@ -209,6 +209,10 @@
       <li>✅ Injected AppDbContext via constructor — replaced hardcoded seed data with DB reads</li>
       <li>✅ GetAll → ToListAsync() | GetById → FindAsync() | Create → Add() + SaveChangesAsync()</li>
       <li>✅ Made all controller actions async/await with Task&lt;ActionResult&lt;T&gt;&gt;</li>
+      <li>✅ Migrated TreasuryController — replaced static BankTransactions list with AppDbContext; added POST Create endpoint</li>
+      <li>✅ Migrated AccountsPayableController — replaced static Invoices list with AppDbContext; all workflow endpoints (approve/pay) now persist to DB</li>
+      <li>✅ Created DbSeeder.cs — seeds all 5 tables on first startup if empty (3 journal entries, 5 bank transactions, 4 invoices, 3 grants, 3 budgets)</li>
+      <li>✅ Wired DbSeeder into Program.cs — runs at app startup using a scoped service scope</li>
     </ul>
   </div>
 
@@ -222,6 +226,8 @@
       <li>✔ async/await — database calls are I/O-bound so they must be awaited; Task&lt;ActionResult&lt;T&gt;&gt; is the async return type</li>
       <li>✔ Connection strings — Server, Database, authentication mode configured in appsettings.json; read at runtime via IConfiguration</li>
       <li>✔ FindAsync vs FirstOrDefaultAsync — FindAsync looks up by primary key and is faster for single-row lookups</li>
+      <li>✔ Seed data pattern — check if table is empty before inserting; use SaveChanges() once at the end, not per row</li>
+      <li>✔ IServiceScope — DbContext is scoped (one per request), so seeding at startup needs a manual scope via app.Services.CreateScope()</li>
     </ul>
   </div>
 
@@ -230,13 +236,15 @@
     <ul>
       <li>❌ Computed properties (IsOverspent, IsBalanced, etc.) can't be mapped to database columns — EF only persists stored fields</li>
       <li>✅ Kept computed properties on the model as C# getters; EF ignores them automatically</li>
+      <li>❌ DbContext is scoped — can't be used directly from the root service provider at startup</li>
+      <li>✅ Wrapped seed call in app.Services.CreateScope() to get a properly scoped DbContext instance</li>
     </ul>
   </div>
 
   <div class="section">
     <h2>🚀 Next Steps</h2>
     <ul>
-      <li>➡ Migrate remaining controllers (Treasury, AP, Grants, Budgeting) from in-memory to EF Core</li>
+      <li>➡ Migrate Grants and Budgeting controllers from in-memory to EF Core</li>
       <li>➡ Start Angular frontend — components, routing, HttpClient service to call the API</li>
       <li>➡ Build journal entry list page and wire it to the GL API</li>
       <li>➡ Plan Azure deployment — App Service + Azure SQL</li>
@@ -245,7 +253,7 @@
 
   <div class="section">
     <h2>🎯 Outcome</h2>
-    <p class="highlight">Replaced the in-memory data layer with a real SQL Server database using Entity Framework Core. AppDbContext maps all 5 modules to SQL tables, InitialCreate migration applied, and the GL controller now reads and writes to a persistent database. Backend is no longer stateless — data survives restarts.</p>
+    <p class="highlight">Replaced in-memory data across 3 controllers (GL, Treasury, AP) with a real SQL Server database using EF Core. AppDbContext maps all 5 modules to SQL tables, InitialCreate migration applied, DbSeeder populates realistic data on first run. Data now persists across restarts — 3 of 5 controllers fully on the database.</p>
   </div>
 </div>
 

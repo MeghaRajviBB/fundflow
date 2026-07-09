@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
+using FundFlowNXT.API.Data;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -7,79 +9,76 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class GrantsController : ControllerBase
     {
-        private static List<Grant> _grants = new List<Grant>
+        private readonly AppDbContext _context;
+
+        public GrantsController(AppDbContext context)
         {
-            new Grant { Id=1, GrantName="Education Initiative", FunderName="Bill Gates Foundation", TotalAmount=500000, SpentAmount=320000, StartDate=DateTime.Now.AddMonths(-6), EndDate=DateTime.Now.AddMonths(6), Status="Active" },
-            new Grant { Id=2, GrantName="Healthcare Outreach", FunderName="Government of India", TotalAmount=200000, SpentAmount=210000, StartDate=DateTime.Now.AddMonths(-12), EndDate=DateTime.Now.AddMonths(1), Status="Active" },
-            new Grant { Id=3, GrantName="Women Empowerment", FunderName="UN Foundation", TotalAmount=350000, SpentAmount=100000, StartDate=DateTime.Now.AddMonths(-3), EndDate=DateTime.Now.AddMonths(9), Status="Active" },
-            new Grant { Id=4, GrantName="Rural Development", FunderName="World Bank", TotalAmount=1000000, SpentAmount=1000000, StartDate=DateTime.Now.AddMonths(-24), EndDate=DateTime.Now.AddMonths(-1), Status="Closed" },
-        };
+            _context = context;
+        }
 
         // GET all grants
         [HttpGet]
-        public ActionResult<List<Grant>> GetAll()
+        public async Task<ActionResult<List<Grant>>> GetAll()
         {
-            return Ok(_grants);
-        }
-
-        // GET overspent grants — restricted fund violation
-        [HttpGet("overspent")]
-        public ActionResult<List<Grant>> GetOverspent()
-        {
-            var overspent = _grants.Where(g => g.IsOverspent).ToList();
-            if (!overspent.Any())
-                return Ok("No overspent grants. All funds within limit.");
-            return Ok(overspent);
-        }
-
-        // GET grant summary
-        [HttpGet("summary")]
-        public ActionResult GetSummary()
-        {
-            var summary = new
-            {
-                TotalGrants = _grants.Count,
-                ActiveGrants = _grants.Count(g => g.Status == "Active"),
-                OverspentGrants = _grants.Count(g => g.IsOverspent),
-                ExpiredGrants = _grants.Count(g => g.IsExpired),
-                TotalFunding = _grants.Sum(g => g.TotalAmount),
-                TotalSpent = _grants.Sum(g => g.SpentAmount),
-                TotalRemaining = _grants.Sum(g => g.RemainingBalance)
-            };
-            return Ok(summary);
-        }
-
-        // POST record spending against a grant
-        [HttpPost("{id}/spend")]
-        public ActionResult RecordSpending(int id, [FromBody] decimal amount)
-        {
-            var grant = _grants.FirstOrDefault(g => g.Id == id);
-            if (grant == null)
-                return NotFound($"Grant {id} not found");
-
-            if (grant.IsExpired)
-                return BadRequest("Cannot spend against an expired grant");
-
-            if (grant.SpentAmount + amount > grant.TotalAmount)
-                return BadRequest($"This spend of {amount} will exceed the grant limit. Remaining balance is {grant.RemainingBalance}");
-
-            grant.SpentAmount += amount;
-            return Ok(new
-            {
-                Message = $"Spending of {amount} recorded successfully",
-                NewSpentAmount = grant.SpentAmount,
-                RemainingBalance = grant.RemainingBalance
-            });
+            var grants = await _context.Grants.ToListAsync();
+            return Ok(grants);
         }
 
         // GET single grant by id
         [HttpGet("{id}")]
-        public ActionResult<Grant> GetById(int id)
+        public async Task<ActionResult<Grant>> GetById(int id)
         {
-            var grant = _grants.FirstOrDefault(g => g.Id == id);
+            var grant = await _context.Grants.FindAsync(id);
             if (grant == null)
                 return NotFound($"Grant {id} not found");
             return Ok(grant);
+        }
+
+        // POST create grant
+        [HttpPost]
+        public async Task<ActionResult<Grant>> Create(Grant grant)
+        {
+            _context.Grants.Add(grant);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetById), new { id = grant.Id }, grant);
+        }
+
+        // POST record spending against a grant
+        [HttpPost("{id}/spend")]
+        public async Task<ActionResult> RecordSpending(int id, [FromBody] decimal amount)
+        {
+            var grant = await _context.Grants.FindAsync(id);
+            if (grant == null)
+                return NotFound($"Grant {id} not found");
+
+            if (grant.SpentAmount + amount > grant.TotalAmount)
+                return BadRequest($"This spend will exceed the grant limit. Remaining balance is {grant.TotalAmount - grant.SpentAmount}");
+
+            grant.SpentAmount += amount;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                Message = $"Spending of {amount} recorded successfully",
+                NewSpentAmount = grant.SpentAmount,
+                RemainingBalance = grant.TotalAmount - grant.SpentAmount
+            });
+        }
+
+        // GET summary
+        [HttpGet("summary")]
+        public async Task<ActionResult> GetSummary()
+        {
+            var grants = await _context.Grants.ToListAsync();
+            return Ok(new
+            {
+                TotalGrants = grants.Count,
+                ActiveGrants = grants.Count(g => g.Status == "Active"),
+                OverspentGrants = grants.Count(g => g.SpentAmount > g.TotalAmount),
+                TotalFunding = grants.Sum(g => g.TotalAmount),
+                TotalSpent = grants.Sum(g => g.SpentAmount),
+                TotalRemaining = grants.Sum(g => g.TotalAmount - g.SpentAmount)
+            });
         }
     }
 }

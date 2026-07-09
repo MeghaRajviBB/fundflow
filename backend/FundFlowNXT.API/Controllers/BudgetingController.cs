@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
+using FundFlowNXT.API.Data;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -7,69 +9,59 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class BudgetingController : ControllerBase
     {
-        private static List<Budget> _budgets = new List<Budget>
+        private readonly AppDbContext _context;
+
+        public BudgetingController(AppDbContext context)
         {
-            new Budget { Id=1, Department="Education", Category="Salaries", BudgetedAmount=300000, ActualAmount=280000, FiscalYear=2025, Quarter="Q1" },
-            new Budget { Id=2, Department="Operations", Category="Equipment", BudgetedAmount=150000, ActualAmount=175000, FiscalYear=2025, Quarter="Q1" },
-            new Budget { Id=3, Department="Healthcare", Category="Supplies", BudgetedAmount=200000, ActualAmount=120000, FiscalYear=2025, Quarter="Q1" },
-            new Budget { Id=4, Department="Fundraising", Category="Marketing", BudgetedAmount=100000, ActualAmount=95000, FiscalYear=2025, Quarter="Q1" },
-        };
+            _context = context;
+        }
 
         // GET all budgets
         [HttpGet]
-        public ActionResult<List<Budget>> GetAll()
+        public async Task<ActionResult<List<Budget>>> GetAll()
         {
-            return Ok(_budgets);
-        }
-
-        // GET over-budget departments
-        [HttpGet("overbudget")]
-        public ActionResult<List<Budget>> GetOverBudget()
-        {
-            var over = _budgets.Where(b => b.IsOverBudget).ToList();
-            if (!over.Any())
-                return Ok("All departments are within budget.");
-            return Ok(over);
+            var budgets = await _context.Budgets.ToListAsync();
+            return Ok(budgets);
         }
 
         // GET budget vs actual comparison
         [HttpGet("comparison")]
-        public ActionResult GetComparison()
+        public async Task<ActionResult> GetComparison()
         {
-            var comparison = _budgets.Select(b => new
+            var budgets = await _context.Budgets.ToListAsync();
+            var comparison = budgets.Select(b => new
             {
                 b.Department,
                 b.Category,
                 b.BudgetedAmount,
                 b.ActualAmount,
-                b.Variance,
-                b.UtilizationPercent,
-                Status = b.IsOverBudget ? "Over Budget" : "Within Budget"
+                Variance = b.BudgetedAmount - b.ActualAmount,
+                Status = b.ActualAmount > b.BudgetedAmount ? "Over Budget" : "Within Budget"
             }).ToList();
             return Ok(comparison);
         }
 
-        // GET overall financial summary
+        // GET summary
         [HttpGet("summary")]
-        public ActionResult GetSummary()
+        public async Task<ActionResult> GetSummary()
         {
-            var summary = new
+            var budgets = await _context.Budgets.ToListAsync();
+            return Ok(new
             {
-                TotalBudgeted = _budgets.Sum(b => b.BudgetedAmount),
-                TotalActual = _budgets.Sum(b => b.ActualAmount),
-                TotalVariance = _budgets.Sum(b => b.Variance),
-                DepartmentsOverBudget = _budgets.Count(b => b.IsOverBudget),
-                DepartmentsWithinBudget = _budgets.Count(b => !b.IsOverBudget)
-            };
-            return Ok(summary);
+                TotalBudgeted = budgets.Sum(b => b.BudgetedAmount),
+                TotalActual = budgets.Sum(b => b.ActualAmount),
+                TotalVariance = budgets.Sum(b => b.BudgetedAmount - b.ActualAmount),
+                DepartmentsOverBudget = budgets.Count(b => b.ActualAmount > b.BudgetedAmount),
+                DepartmentsWithinBudget = budgets.Count(b => b.ActualAmount <= b.BudgetedAmount)
+            });
         }
 
-        // POST create a new budget line
+        // POST create budget line
         [HttpPost]
-        public ActionResult<Budget> Create(Budget budget)
+        public async Task<ActionResult<Budget>> Create(Budget budget)
         {
-            budget.Id = _budgets.Count + 1;
-            _budgets.Add(budget);
+            _context.Budgets.Add(budget);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = budget.Id }, budget);
         }
     }
