@@ -213,6 +213,9 @@
       <li>✅ Migrated AccountsPayableController — replaced static Invoices list with AppDbContext; all workflow endpoints (approve/pay) now persist to DB</li>
       <li>✅ Created DbSeeder.cs — seeds all 5 tables on first startup if empty (3 journal entries, 5 bank transactions, 4 invoices, 3 grants, 3 budgets)</li>
       <li>✅ Wired DbSeeder into Program.cs — runs at app startup using a scoped service scope</li>
+      <li>✅ Migrated GrantsController — replaced static list with AppDbContext; added POST Create; summary and spend endpoints now read/write to DB</li>
+      <li>✅ Migrated BudgetingController — replaced static list with AppDbContext; comparison and summary now query live DB data</li>
+      <li>✅ All 5 controllers (GL, Treasury, AP, Grants, Budgeting) fully connected to SQL Server — backend 100% on the database</li>
     </ul>
   </div>
 
@@ -244,7 +247,6 @@
   <div class="section">
     <h2>🚀 Next Steps</h2>
     <ul>
-      <li>➡ Migrate Grants and Budgeting controllers from in-memory to EF Core</li>
       <li>➡ Start Angular frontend — components, routing, HttpClient service to call the API</li>
       <li>➡ Build journal entry list page and wire it to the GL API</li>
       <li>➡ Plan Azure deployment — App Service + Azure SQL</li>
@@ -253,7 +255,7 @@
 
   <div class="section">
     <h2>🎯 Outcome</h2>
-    <p class="highlight">Replaced in-memory data across 3 controllers (GL, Treasury, AP) with a real SQL Server database using EF Core. AppDbContext maps all 5 modules to SQL tables, InitialCreate migration applied, DbSeeder populates realistic data on first run. Data now persists across restarts — 3 of 5 controllers fully on the database.</p>
+    <p class="highlight">Completed the full database migration — all 5 controllers (GL, Treasury, AP, Grants, Budgeting) are now reading and writing to SQL Server via EF Core. AppDbContext, InitialCreate migration, and DbSeeder all in place. The entire backend is persistent, async, and production-ready from a data layer perspective.</p>
   </div>
 </div>
 
