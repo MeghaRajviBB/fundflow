@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
+using FundFlowNXT.API.Data;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -7,51 +9,40 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class JournalEntryController : ControllerBase
     {
-        private static List<JournalEntry> _entries = new List<JournalEntry>
-        {
-            new JournalEntry
-            {
-                Id = 1,
-                Description = "Office Supplies",
-                DebitAmount = 5000,
-                CreditAmount = 5000,
-                Date = DateTime.Now,
-                Fund = "Operations Fund"
-            },
-            new JournalEntry
-            {
-                Id = 2,
-                Description = "Education Program",
-                DebitAmount = 10000,
-                CreditAmount = 8000,
-                Date = DateTime.Now,
-                Fund = "Education Fund"
-            }
-        };
+        private readonly AppDbContext _context;
 
-        [HttpGet]
-        public ActionResult<List<JournalEntry>> GetAll()
+        public JournalEntryController(AppDbContext context)
         {
-            return Ok(_entries);
+            _context = context;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<JournalEntry> GetById(int id)
+        // GET all journal entries
+        [HttpGet]
+        public async Task<ActionResult<List<JournalEntry>>> GetAll()
         {
-            var entry = _entries.FirstOrDefault(e => e.Id == id);
+            var entries = await _context.JournalEntries.ToListAsync();
+            return Ok(entries);
+        }
+
+        // GET by id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<JournalEntry>> GetById(int id)
+        {
+            var entry = await _context.JournalEntries.FindAsync(id);
             if (entry == null)
                 return NotFound();
             return Ok(entry);
         }
 
+        // POST create entry
         [HttpPost]
-        public ActionResult<JournalEntry> Create(JournalEntry entry)
+        public async Task<ActionResult<JournalEntry>> Create(JournalEntry entry)
         {
-            entry.Id = _entries.Count + 1;
-            _entries.Add(entry);
-
-            if (!entry.IsBalanced)
+            if (entry.DebitAmount != entry.CreditAmount)
                 return BadRequest("Entry is not balanced. Debit must equal Credit.");
+
+            _context.JournalEntries.Add(entry);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = entry.Id }, entry);
         }

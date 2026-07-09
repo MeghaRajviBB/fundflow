@@ -30,7 +30,8 @@
   <h2>📋 Table of Contents</h2>
   <ul id="toc">
     <li><a href="#day1">Day 1 — 2026-07-07 | Project Setup + GL + Treasury APIs</a></li>
-    <li><a href="#day2">Day 2 — 2026-07-08 | Accounts Payable Controller + Aging Report</a></li>
+    <li><a href="#day2">Day 2 — 2026-07-08 | Accounts Payable + Grants + Budgeting — Backend Complete (5 Modules)</a></li>
+    <li><a href="#day3">Day 3 — 2026-07-09 | Entity Framework Core + SQL Server Database Setup</a></li>
   </ul>
 </div>
 
@@ -45,9 +46,11 @@
     <tr><td>3.2</td><td>Build General Ledger controller</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
     <tr><td>3.3</td><td>Build Treasury controller with bulk clearing</td><td>✅ Done</td><td><a href="#day1">Day 1</a> <span class="day-chip">2026-07-07</span></td></tr>
     <tr><td>3.4</td><td>Build Accounts Payable controller</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
+    <tr><td>3.5</td><td>Build Grants controller with overspent/fund enforcement</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
+    <tr><td>3.6</td><td>Build Budgeting controller with variance and comparison</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
     <tr><td>2.1</td><td>Create Angular project</td><td>⬜ Backlog</td><td>—</td></tr>
     <tr><td>2.2</td><td>Build journal entry list page</td><td>⬜ Backlog</td><td>—</td></tr>
-    <tr><td>4.1</td><td>Set up SQL Server</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>4.1</td><td>Set up SQL Server + Entity Framework Core</td><td>✅ Done</td><td><a href="#day3">Day 3</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>5.1</td><td>Deploy to Azure App Service</td><td>⬜ Backlog</td><td>—</td></tr>
     <tr><td>5.2</td><td>Add AI anomaly detection</td><td>⬜ Backlog</td><td>—</td></tr>
   </table>
@@ -113,7 +116,7 @@
 <!-- DAY 2 -->
 <div class="day-card" id="day2">
   <span class="date-badge">📅 2026-07-08</span>
-  <h2>🧾 Day 2 — Accounts Payable Controller + Aging Report</h2>
+  <h2>🧾 Day 2 — Accounts Payable + Grants + Budgeting — Backend Complete (5 Modules)</h2>
 
   <div class="section">
     <h2>📌 What I Built Today</h2>
@@ -131,6 +134,26 @@
   </div>
 
   <div class="section">
+    <h2>📌 What I Built Today (cont.) — Grants + Budgeting</h2>
+    <ul>
+      <li>✅ Built Grant model — GrantName, FunderName, TotalAmount, SpentAmount, StartDate, EndDate, Status with IsOverspent / IsExpired / RemainingBalance computed properties</li>
+      <li>✅ Built GrantsController with full grants management</li>
+      <li>✅ GET /api/Grants — list all grants</li>
+      <li>✅ GET /api/Grants/overspent — flag restricted fund violations (spent > total)</li>
+      <li>✅ GET /api/Grants/summary — totals: funding, spent, remaining, active/expired counts</li>
+      <li>✅ GET /api/Grants/{id} — get single grant by id</li>
+      <li>✅ POST /api/Grants/{id}/spend — record spending with enforcement: blocks if expired or would exceed limit</li>
+      <li>✅ Built Budget model — Department, Category, BudgetedAmount, ActualAmount, FiscalYear, Quarter with IsOverBudget / Variance / UtilizationPercent computed properties</li>
+      <li>✅ Built BudgetingController with budget vs actual tracking</li>
+      <li>✅ GET /api/Budgeting — list all budget lines</li>
+      <li>✅ GET /api/Budgeting/overbudget — flag departments that exceeded budget</li>
+      <li>✅ GET /api/Budgeting/comparison — budget vs actual with variance and utilization % per department</li>
+      <li>✅ GET /api/Budgeting/summary — org-wide totals: budgeted, actual, variance, over/within counts</li>
+      <li>✅ POST /api/Budgeting — create a new budget line</li>
+    </ul>
+  </div>
+
+  <div class="section">
     <h2>🧠 Key Learnings</h2>
     <ul>
       <li>✔ Computed properties in C# — IsOverdue uses get { return ... } to derive value from DueDate</li>
@@ -138,6 +161,10 @@
       <li>✔ Anonymous objects — returning shaped JSON without creating a separate class</li>
       <li>✔ LINQ .Where, .Count, .Sum chained together to build an aging report in one block</li>
       <li>✔ Route parameters — {id}/approve pattern to action on a specific resource</li>
+      <li>✔ Multiple computed properties on a model — IsOverspent, IsExpired, RemainingBalance all derived from stored fields</li>
+      <li>✔ Restricted fund enforcement — blocking a spend POST if it would exceed the grant's TotalAmount</li>
+      <li>✔ Variance and utilization — Variance = BudgetedAmount - ActualAmount; UtilizationPercent = ActualAmount / BudgetedAmount * 100</li>
+      <li>✔ LINQ .Select to project models into shaped anonymous objects for comparison reports</li>
     </ul>
   </div>
 
@@ -152,16 +179,73 @@
   <div class="section">
     <h2>🚀 Next Steps</h2>
     <ul>
-      <li>➡ Commit AccountsPayableController and Invoice model to GitHub</li>
-      <li>➡ Build Grants and Budgeting controllers</li>
-      <li>➡ Start Angular frontend — Week 2 learning plan</li>
-      <li>➡ Discuss dev database access with Satya</li>
+      <li>➡ Set up Entity Framework Core + SQL Server database</li>
+      <li>➡ Start Angular frontend — Week 2 learning plan (components, routing, services)</li>
+      <li>➡ Build journal entry list page and connect to GL API</li>
+      <li>➡ Plan Azure deployment — App Service + SQL Azure</li>
     </ul>
   </div>
 
   <div class="section">
     <h2>🎯 Outcome</h2>
-    <p class="highlight">Built the Accounts Payable module with a complete 3-stage approval workflow (Pending → Approved → Paid), overdue detection, status filtering, and an aging report endpoint — all in a single controller. Mirrors real-world AP processes used in FinancialEdge NXT.</p>
+    <p class="highlight">Completed the entire backend API — 5 modules total: General Ledger, Treasury, Accounts Payable, Grants, and Budgeting. Backend fully working in Swagger with fund enforcement, aging reports, variance analysis, and approval workflows. All committed to GitHub.</p>
+  </div>
+</div>
+
+<!-- DAY 3 -->
+<div class="day-card" id="day3">
+  <span class="date-badge">📅 2026-07-09</span>
+  <h2>🗄️ Day 3 — Entity Framework Core + SQL Server Database Setup</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Installed EF Core NuGet packages — Microsoft.EntityFrameworkCore.SqlServer v10.0.9 and Microsoft.EntityFrameworkCore.Tools v10.0.9</li>
+      <li>✅ Created AppDbContext — inherits DbContext, exposes DbSets for all 5 modules (JournalEntries, BankTransactions, Invoices, Grants, Budgets)</li>
+      <li>✅ Configured SQL Server LocalDB connection string in appsettings.json (FundFlowNXT database)</li>
+      <li>✅ Registered AppDbContext in Program.cs with UseSqlServer — dependency injection wired up</li>
+      <li>✅ Generated InitialCreate migration — creates 5 tables with correct column types and identity PKs</li>
+      <li>✅ Migrated JournalEntryController from in-memory static list to real EF Core database</li>
+      <li>✅ Injected AppDbContext via constructor — replaced hardcoded seed data with DB reads</li>
+      <li>✅ GetAll → ToListAsync() | GetById → FindAsync() | Create → Add() + SaveChangesAsync()</li>
+      <li>✅ Made all controller actions async/await with Task&lt;ActionResult&lt;T&gt;&gt;</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Entity Framework Core — ORM that maps C# classes to SQL tables, eliminates raw SQL for CRUD</li>
+      <li>✔ DbContext — the bridge between your app and the database; DbSet&lt;T&gt; represents a table</li>
+      <li>✔ Dependency Injection — DbContext is registered as a service in Program.cs and injected into controllers via constructor</li>
+      <li>✔ EF Migrations — dotnet ef migrations add creates a versioned snapshot of schema changes; update-database applies them</li>
+      <li>✔ async/await — database calls are I/O-bound so they must be awaited; Task&lt;ActionResult&lt;T&gt;&gt; is the async return type</li>
+      <li>✔ Connection strings — Server, Database, authentication mode configured in appsettings.json; read at runtime via IConfiguration</li>
+      <li>✔ FindAsync vs FirstOrDefaultAsync — FindAsync looks up by primary key and is faster for single-row lookups</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ Computed properties (IsOverspent, IsBalanced, etc.) can't be mapped to database columns — EF only persists stored fields</li>
+      <li>✅ Kept computed properties on the model as C# getters; EF ignores them automatically</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Migrate remaining controllers (Treasury, AP, Grants, Budgeting) from in-memory to EF Core</li>
+      <li>➡ Start Angular frontend — components, routing, HttpClient service to call the API</li>
+      <li>➡ Build journal entry list page and wire it to the GL API</li>
+      <li>➡ Plan Azure deployment — App Service + Azure SQL</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">Replaced the in-memory data layer with a real SQL Server database using Entity Framework Core. AppDbContext maps all 5 modules to SQL tables, InitialCreate migration applied, and the GL controller now reads and writes to a persistent database. Backend is no longer stateless — data survives restarts.</p>
   </div>
 </div>
 

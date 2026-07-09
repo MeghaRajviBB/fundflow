@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
+using FundFlowNXT.API.Data;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -7,37 +9,28 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class AccountsPayableController : ControllerBase
     {
-        private static List<Invoice> _invoices = new List<Invoice>
+        private readonly AppDbContext _context;
+
+        public AccountsPayableController(AppDbContext context)
         {
-            new Invoice { Id=1, VendorName="Office Depot", Description="Office Supplies", Amount=15000, InvoiceDate=DateTime.Now.AddDays(-30), DueDate=DateTime.Now.AddDays(-5), Status="Pending" },
-            new Invoice { Id=2, VendorName="Azure Cloud", Description="Cloud Services", Amount=25000, InvoiceDate=DateTime.Now.AddDays(-15), DueDate=DateTime.Now.AddDays(10), Status="Approved" },
-            new Invoice { Id=3, VendorName="Cleaning Co", Description="Office Cleaning", Amount=8000, InvoiceDate=DateTime.Now.AddDays(-45), DueDate=DateTime.Now.AddDays(-20), Status="Pending" },
-            new Invoice { Id=4, VendorName="Tech Support", Description="IT Services", Amount=35000, InvoiceDate=DateTime.Now.AddDays(-10), DueDate=DateTime.Now.AddDays(15), Status="Paid" },
-            new Invoice { Id=5, VendorName="Print Media", Description="Marketing Materials", Amount=12000, InvoiceDate=DateTime.Now.AddDays(-20), DueDate=DateTime.Now.AddDays(5), Status="Pending" },
-        };
+            _context = context;
+        }
 
         // GET all invoices
         [HttpGet]
-        public ActionResult<List<Invoice>> GetAll()
+        public async Task<ActionResult<List<Invoice>>> GetAll()
         {
-            return Ok(_invoices);
+            var invoices = await _context.Invoices.ToListAsync();
+            return Ok(invoices);
         }
 
-        // GET overdue invoices only
-        [HttpGet("overdue")]
-        public ActionResult<List<Invoice>> GetOverdue()
-        {
-            var overdue = _invoices.Where(i => i.IsOverdue).ToList();
-            return Ok(overdue);
-        }
-
-        // GET invoices by status
+        // GET by status
         [HttpGet("status/{status}")]
-        public ActionResult<List<Invoice>> GetByStatus(string status)
+        public async Task<ActionResult<List<Invoice>>> GetByStatus(string status)
         {
-            var filtered = _invoices
+            var filtered = await _context.Invoices
                 .Where(i => i.Status.ToLower() == status.ToLower())
-                .ToList();
+                .ToListAsync();
 
             if (!filtered.Any())
                 return NotFound($"No invoices found with status: {status}");
@@ -45,21 +38,21 @@ namespace FundFlowNXT.API.Controllers
             return Ok(filtered);
         }
 
-        // POST create new invoice
+        // POST create invoice
         [HttpPost]
-        public ActionResult<Invoice> Create(Invoice invoice)
+        public async Task<ActionResult<Invoice>> Create(Invoice invoice)
         {
-            invoice.Id = _invoices.Count + 1;
             invoice.Status = "Pending";
-            _invoices.Add(invoice);
+            _context.Invoices.Add(invoice);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = invoice.Id }, invoice);
         }
 
-        // PUT approve invoice
+        // PUT approve
         [HttpPut("{id}/approve")]
-        public ActionResult Approve(int id)
+        public async Task<ActionResult> Approve(int id)
         {
-            var invoice = _invoices.FirstOrDefault(i => i.Id == id);
+            var invoice = await _context.Invoices.FindAsync(id);
             if (invoice == null)
                 return NotFound($"Invoice {id} not found");
 
@@ -67,14 +60,15 @@ namespace FundFlowNXT.API.Controllers
                 return BadRequest("Invoice is already paid");
 
             invoice.Status = "Approved";
+            await _context.SaveChangesAsync();
             return Ok($"Invoice {id} approved successfully");
         }
 
-        // PUT mark as paid
+        // PUT pay
         [HttpPut("{id}/pay")]
-        public ActionResult Pay(int id)
+        public async Task<ActionResult> Pay(int id)
         {
-            var invoice = _invoices.FirstOrDefault(i => i.Id == id);
+            var invoice = await _context.Invoices.FindAsync(id);
             if (invoice == null)
                 return NotFound($"Invoice {id} not found");
 
@@ -82,27 +76,24 @@ namespace FundFlowNXT.API.Controllers
                 return BadRequest("Invoice must be approved before payment");
 
             invoice.Status = "Paid";
+            await _context.SaveChangesAsync();
             return Ok($"Invoice {id} marked as paid");
         }
 
         // GET aging report
         [HttpGet("aging")]
-        public ActionResult GetAgingReport()
+        public async Task<ActionResult> GetAgingReport()
         {
+            var invoices = await _context.Invoices.ToListAsync();
             var report = new
             {
-                TotalInvoices = _invoices.Count,
-                TotalPending = _invoices.Count(i => i.Status == "Pending"),
-                TotalApproved = _invoices.Count(i => i.Status == "Approved"),
-                TotalPaid = _invoices.Count(i => i.Status == "Paid"),
-                TotalOverdue = _invoices.Count(i => i.IsOverdue),
-                TotalAmountPending = _invoices
+                TotalInvoices = invoices.Count,
+                TotalPending = invoices.Count(i => i.Status == "Pending"),
+                TotalApproved = invoices.Count(i => i.Status == "Approved"),
+                TotalPaid = invoices.Count(i => i.Status == "Paid"),
+                TotalAmountPending = invoices
                     .Where(i => i.Status != "Paid")
-                    .Sum(i => i.Amount),
-                OverdueInvoices = _invoices
-                    .Where(i => i.IsOverdue)
-                    .Select(i => new { i.Id, i.VendorName, i.Amount, i.DueDate })
-                    .ToList()
+                    .Sum(i => i.Amount)
             };
             return Ok(report);
         }
