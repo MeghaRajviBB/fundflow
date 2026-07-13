@@ -1,0 +1,35 @@
+<div class="page">
+  <h2>Accounts Payable — Invoices</h2>
+  <p class="subtitle">Vendor invoices and approval workflow</p>
+
+  <div *ngIf="loading" class="loading">Loading data from database...</div>
+
+  <table *ngIf="!loading" class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Vendor</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Due Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let inv of invoices">
+        <td>{{ inv.id }}</td>
+        <td>{{ inv.vendorName }}</td>
+        <td>{{ inv.description }}</td>
+        <td>₹{{ inv.amount }}</td>
+        <td>{{ inv.dueDate | date:'dd MMM yyyy' }}</td>
+        <td>
+          <span class="status" [class.paid]="inv.status === 'Paid'"
+                               [class.approved]="inv.status === 'Approved'"
+                               [class.pending]="inv.status === 'Pending'">
+            {{ inv.status }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,35 @@
+<div class="page">
+  <h2>Budgeting — Budget vs Actual</h2>
+  <p class="subtitle">Department budgets and variance tracking</p>
+
+  <div *ngIf="loading" class="loading">Loading data from database...</div>
+
+  <table *ngIf="!loading" class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Department</th>
+        <th>Category</th>
+        <th>Budgeted</th>
+        <th>Actual</th>
+        <th>Variance</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let b of budgets">
+        <td>{{ b.id }}</td>
+        <td>{{ b.department }}</td>
+        <td>{{ b.category }}</td>
+        <td>₹{{ b.budgetedAmount }}</td>
+        <td>₹{{ b.actualAmount }}</td>
+        <td>₹{{ b.variance }}</td>
+        <td>
+          <span class="status" [class.over]="b.isOverBudget" [class.within]="!b.isOverBudget">
+            {{ b.isOverBudget ? 'Over Budget' : 'Within Budget' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

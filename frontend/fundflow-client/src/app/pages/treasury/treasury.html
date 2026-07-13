@@ -1,0 +1,33 @@
+<div class="page">
+  <h2>Treasury — Bank Transactions</h2>
+  <p class="subtitle">Bank accounts and transaction clearing</p>
+
+  <div *ngIf="loading" class="loading">Loading data from database...</div>
+
+  <table *ngIf="!loading" class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Bank Account</th>
+        <th>Cleared</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of transactions">
+        <td>{{ t.id }}</td>
+        <td>{{ t.description }}</td>
+        <td>₹{{ t.amount }}</td>
+        <td>{{ t.type }}</td>
+        <td>{{ t.bankAccount }}</td>
+        <td>
+          <span [class.cleared]="t.isCleared" [class.uncleared]="!t.isCleared">
+            {{ t.isCleared ? 'Cleared' : 'Pending' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

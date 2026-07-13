@@ -31,7 +31,8 @@
   <ul id="toc">
     <li><a href="#day1">Day 1 — 2026-07-07 | Project Setup + GL + Treasury APIs</a></li>
     <li><a href="#day2">Day 2 — 2026-07-08 | Accounts Payable + Grants + Budgeting — Backend Complete (5 Modules)</a></li>
-    <li><a href="#day3">Day 3 — 2026-07-09 | Entity Framework Core + SQL Server Database Setup</a></li>
+    <li><a href="#day3">Day 3 — 2026-07-09 | Entity Framework Core + SQL Server — Full Database Migration</a></li>
+    <li><a href="#day4">Day 4 — 2026-07-09 | Angular Frontend — Live Journal Entries from Database</a></li>
   </ul>
 </div>
 
@@ -48,8 +49,8 @@
     <tr><td>3.4</td><td>Build Accounts Payable controller</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
     <tr><td>3.5</td><td>Build Grants controller with overspent/fund enforcement</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
     <tr><td>3.6</td><td>Build Budgeting controller with variance and comparison</td><td>✅ Done</td><td><a href="#day2">Day 2</a> <span class="day-chip">2026-07-08</span></td></tr>
-    <tr><td>2.1</td><td>Create Angular project</td><td>⬜ Backlog</td><td>—</td></tr>
-    <tr><td>2.2</td><td>Build journal entry list page</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>2.1</td><td>Create Angular project</td><td>✅ Done</td><td><a href="#day4">Day 4</a> <span class="day-chip">2026-07-09</span></td></tr>
+    <tr><td>2.2</td><td>Build journal entry list page connected to live API</td><td>✅ Done</td><td><a href="#day4">Day 4</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>4.1</td><td>Set up SQL Server + Entity Framework Core</td><td>✅ Done</td><td><a href="#day3">Day 3</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>5.1</td><td>Deploy to Azure App Service</td><td>⬜ Backlog</td><td>—</td></tr>
     <tr><td>5.2</td><td>Add AI anomaly detection</td><td>⬜ Backlog</td><td>—</td></tr>
@@ -256,6 +257,67 @@
   <div class="section">
     <h2>🎯 Outcome</h2>
     <p class="highlight">Completed the full database migration — all 5 controllers (GL, Treasury, AP, Grants, Budgeting) are now reading and writing to SQL Server via EF Core. AppDbContext, InitialCreate migration, and DbSeeder all in place. The entire backend is persistent, async, and production-ready from a data layer perspective.</p>
+  </div>
+</div>
+
+<!-- DAY 4 -->
+<div class="day-card" id="day4">
+  <span class="date-badge">📅 2026-07-09</span>
+  <h2>🅰️ Day 4 — Angular Frontend — Live Journal Entries from Database</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Scaffolded Angular 19 project — fundflow-client in frontend/ folder</li>
+      <li>✅ Configured app.config.ts — registered provideHttpClient() and provideRouter() for standalone app</li>
+      <li>✅ Built ApiService (src/app/services/api.ts) — HttpClient-based service with methods for all 5 modules</li>
+      <li>✅ getJournalEntries() → GET /api/JournalEntry</li>
+      <li>✅ getBankTransactions() → GET /api/Treasury</li>
+      <li>✅ getInvoices() → GET /api/AccountsPayable</li>
+      <li>✅ getGrants() → GET /api/Grants</li>
+      <li>✅ getBudgets() → GET /api/Budgeting</li>
+      <li>✅ Built AppComponent (standalone) — calls api.getJournalEntries() in ngOnInit, subscribes to Observable</li>
+      <li>✅ Built app.html template — loading spinner state + data table with columns: ID, Description, Debit, Credit, Fund, Balanced</li>
+      <li>✅ Balanced column uses class binding [class.balanced] / [class.unbalanced] for visual indicator</li>
+      <li>✅ App running and displaying live journal entry data fetched from SQL Server via the .NET API</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Angular standalone components — no NgModule needed; imports declared directly on @Component</li>
+      <li>✔ provideHttpClient() — registers Angular's HTTP layer in app.config.ts instead of importing HttpClientModule</li>
+      <li>✔ Injectable service — @Injectable({ providedIn: 'root' }) makes ApiService a singleton available app-wide</li>
+      <li>✔ Observable + subscribe — HttpClient.get() returns an Observable; subscribe() fires when data arrives (next) or fails (error)</li>
+      <li>✔ ngOnInit — lifecycle hook that runs after component is constructed; right place to fetch data</li>
+      <li>✔ *ngIf / *ngFor — structural directives to conditionally render and loop over data in the template</li>
+      <li>✔ Class binding [class.name] — conditionally applies a CSS class based on a boolean expression</li>
+      <li>✔ ChangeDetectorRef — manually triggers Angular's change detection after async data arrives</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ CORS blocked the frontend from calling the API — browser rejected cross-origin requests</li>
+      <li>✅ CORS already configured in Program.cs from Day 1 — just needed to verify the Angular dev server port matched</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Add more pages — Treasury, AP, Grants, Budgeting views using the ApiService methods already built</li>
+      <li>➡ Add Angular routing — navigate between module pages</li>
+      <li>➡ Style the app with Blackbaud Sky UX or custom CSS</li>
+      <li>➡ Plan Azure deployment — App Service (API) + Static Web Apps (Angular) + Azure SQL</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">First full-stack milestone — Angular frontend calling the .NET API which reads from SQL Server. Real data flowing end-to-end: SQL Server → EF Core → ASP.NET API → HttpClient → Angular table. The entire stack is connected and working.</p>
   </div>
 </div>
 

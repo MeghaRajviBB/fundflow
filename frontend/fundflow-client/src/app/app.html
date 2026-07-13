@@ -1,39 +1,20 @@
-<div class="app-container">
-  <header class="header">
-    <h1>🏦 FundFlow NXT</h1>
-    <p>Nonprofit Fund Accounting — inspired by FinancialEdge NXT</p>
-  </header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>🏦 FundFlow NXT</h1>
+      <p>FinancialEdge NXT POC</p>
+    </div>
+    <nav class="nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">📊 Dashboard</a>
+      <a routerLink="/journal-entries" routerLinkActive="active">📒 General Ledger</a>
+      <a routerLink="/treasury" routerLinkActive="active">🏦 Treasury</a>
+      <a routerLink="/accounts-payable" routerLinkActive="active">🧾 Accounts Payable</a>
+      <a routerLink="/grants" routerLinkActive="active">🎯 Grants</a>
+      <a routerLink="/budgeting" routerLinkActive="active">📈 Budgeting</a>
+    </nav>
+  </aside>
 
-  <main class="content">
-    <h2>General Ledger — Journal Entries</h2>
-
-    <div *ngIf="loading" class="loading">Loading data from database...</div>
-
-    <table *ngIf="!loading" class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Description</th>
-          <th>Debit</th>
-          <th>Credit</th>
-          <th>Fund</th>
-          <th>Balanced</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let entry of journalEntries">
-          <td>{{ entry.id }}</td>
-          <td>{{ entry.description }}</td>
-          <td>₹{{ entry.debitAmount }}</td>
-          <td>₹{{ entry.creditAmount }}</td>
-          <td>{{ entry.fund }}</td>
-          <td>
-            <span [class.balanced]="entry.isBalanced" [class.unbalanced]="!entry.isBalanced">
-              {{ entry.isBalanced ? '✓' : '✗' }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <main class="main-content">
+    <router-outlet></router-outlet>
   </main>
 </div>

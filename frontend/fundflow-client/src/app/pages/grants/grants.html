@@ -1,0 +1,35 @@
+<div class="page">
+  <h2>Grants — Restricted Funds</h2>
+  <p class="subtitle">Grant tracking with overspend detection</p>
+
+  <div *ngIf="loading" class="loading">Loading data from database...</div>
+
+  <table *ngIf="!loading" class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Grant Name</th>
+        <th>Funder</th>
+        <th>Total</th>
+        <th>Spent</th>
+        <th>Remaining</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of grants">
+        <td>{{ g.id }}</td>
+        <td>{{ g.grantName }}</td>
+        <td>{{ g.funderName }}</td>
+        <td>₹{{ g.totalAmount }}</td>
+        <td>₹{{ g.spentAmount }}</td>
+        <td>₹{{ g.remainingBalance }}</td>
+        <td>
+          <span class="status" [class.overspent]="g.isOverspent" [class.ok]="!g.isOverspent">
+            {{ g.isOverspent ? 'Overspent' : 'On Track' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,33 @@
+<div class="page">
+  <h2>General Ledger — Journal Entries</h2>
+  <p class="subtitle">All financial transactions, with automatic debit = credit validation</p>
+
+  <div *ngIf="loading" class="loading">Loading data from database...</div>
+
+  <table *ngIf="!loading" class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Debit</th>
+        <th>Credit</th>
+        <th>Fund</th>
+        <th>Balanced</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let entry of journalEntries">
+        <td>{{ entry.id }}</td>
+        <td>{{ entry.description }}</td>
+        <td>₹{{ entry.debitAmount }}</td>
+        <td>₹{{ entry.creditAmount }}</td>
+        <td>{{ entry.fund }}</td>
+        <td>
+          <span [class.balanced]="entry.isBalanced" [class.unbalanced]="!entry.isBalanced">
+            {{ entry.isBalanced ? '✓' : '✗' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
