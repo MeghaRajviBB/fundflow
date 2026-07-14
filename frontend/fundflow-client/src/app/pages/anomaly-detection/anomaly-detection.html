@@ -1,0 +1,84 @@
+<div class="page">
+  <h2>✨ AI Anomaly Detection</h2>
+  <p class="subtitle">Analyze journal entries for accounting anomalies and restricted-fund violations</p>
+
+  <div class="grid">
+    <!-- LEFT: Input form -->
+    <div class="card">
+      <h3>Test an Entry</h3>
+      <label>Description</label>
+      <input [(ngModel)]="entry.description" placeholder="e.g. Education transfer" />
+
+      <label>Debit Amount (₹)</label>
+      <input type="number" [(ngModel)]="entry.debitAmount" />
+
+      <label>Credit Amount (₹)</label>
+      <input type="number" [(ngModel)]="entry.creditAmount" />
+
+      <label>Fund</label>
+      <select [(ngModel)]="entry.fund">
+        <option *ngFor="let f of funds" [value]="f">{{ f }}</option>
+      </select>
+
+      <button (click)="analyze()" [disabled]="analyzing">
+        {{ analyzing ? 'Analyzing...' : 'Analyze with AI' }}
+      </button>
+    </div>
+
+    <!-- RIGHT: Result -->
+    <div class="card result-card" *ngIf="result">
+      <div class="result-header"
+           [class.ok]="!result.hasAnomaly"
+           [class.high]="result.severity === 'High'"
+           [class.medium]="result.severity === 'Medium'"
+           [class.low]="result.severity === 'Low'">
+        {{ result.hasAnomaly ? '⚠ Anomaly Detected' : '✓ No Anomaly' }}
+        <span class="severity" *ngIf="result.hasAnomaly">Severity: {{ result.severity }}</span>
+      </div>
+      <div class="result-body">
+        <p class="label">Explanation</p>
+        <p class="text">{{ result.explanation }}</p>
+        <p class="label">Recommendation</p>
+        <p class="text">{{ result.recommendation }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN ALL section -->
+  <div class="scan-section">
+    <div class="scan-head">
+      <div>
+        <h3>Scan Entire Ledger</h3>
+        <p class="subtitle">Run AI analysis across all journal entries in the database</p>
+      </div>
+      <button (click)="scanAll()" [disabled]="scanning">
+        {{ scanning ? 'Scanning...' : 'Scan All Entries' }}
+      </button>
+    </div>
+
+    <div *ngIf="scanResult" class="scan-summary">
+      Scanned {{ scanResult.totalScanned }} entries — found {{ scanResult.anomaliesFound }} anomalies.
+    </div>
+
+    <table *ngIf="scanResult && scanResult.anomalies.length > 0" class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Description</th>
+          <th>Fund</th>
+          <th>Severity</th>
+          <th>Explanation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of scanResult.anomalies">
+          <td>{{ a.id }}</td>
+          <td>{{ a.description }}</td>
+          <td>{{ a.fund }}</td>
+          <td><span class="badge" [class.high]="a.severity==='High'" [class.medium]="a.severity==='Medium'" [class.low]="a.severity==='Low'">{{ a.severity }}</span></td>
+          <td>{{ a.explanation }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

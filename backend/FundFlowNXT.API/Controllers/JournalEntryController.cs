@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FundFlowNXT.API.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
 using FundFlowNXT.API.Data;
@@ -10,10 +11,12 @@ namespace FundFlowNXT.API.Controllers
     public class JournalEntryController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly AnomalyDetectionService _anomalyService;
 
-        public JournalEntryController(AppDbContext context)
+        public JournalEntryController(AppDbContext context, AnomalyDetectionService anomalyService)
         {
             _context = context;
+            _anomalyService = anomalyService;
         }
 
         // GET all journal entries
@@ -45,6 +48,48 @@ namespace FundFlowNXT.API.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = entry.Id }, entry);
+        }
+
+        // POST analyze a single entry for anomalies (without saving)
+        [HttpPost("analyze")]
+        public ActionResult Analyze(JournalEntry entry)
+        {
+            var result = _anomalyService.AnalyzeJournalEntry(entry);
+            return Ok(result);
+        }
+
+        // GET scan all existing entries for anomalies
+        [HttpGet("scan-anomalies")]
+        public async Task<ActionResult> ScanAnomalies()
+        {
+            var entries = await _context.JournalEntries.ToListAsync();
+            var flagged = new List<object>();
+
+            foreach (var entry in entries)
+            {
+                var result = _anomalyService.AnalyzeJournalEntry(entry);
+                if (result.HasAnomaly)
+                {
+                    flagged.Add(new
+                    {
+                        entry.Id,
+                        entry.Description,
+                        entry.Fund,
+                        entry.DebitAmount,
+                        entry.CreditAmount,
+                        result.Severity,
+                        result.Explanation,
+                        result.Recommendation
+                    });
+                }
+            }
+
+            return Ok(new
+            {
+                TotalScanned = entries.Count,
+                AnomaliesFound = flagged.Count,
+                Anomalies = flagged
+            });
         }
     }
 }

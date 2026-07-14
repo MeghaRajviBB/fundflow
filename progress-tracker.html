@@ -33,6 +33,7 @@
     <li><a href="#day2">Day 2 — 2026-07-08 | Accounts Payable + Grants + Budgeting — Backend Complete (5 Modules)</a></li>
     <li><a href="#day3">Day 3 — 2026-07-09 | Entity Framework Core + SQL Server — Full Database Migration</a></li>
     <li><a href="#day4">Day 4 — 2026-07-09 | Angular Frontend — Live Journal Entries from Database</a></li>
+    <li><a href="#day5">Day 5 — 2026-07-13 | Full Angular App — Dashboard, Navigation, All 5 Module Pages</a></li>
   </ul>
 </div>
 
@@ -308,9 +309,9 @@
   <div class="section">
     <h2>🚀 Next Steps</h2>
     <ul>
-      <li>➡ Add more pages — Treasury, AP, Grants, Budgeting views using the ApiService methods already built</li>
-      <li>➡ Add Angular routing — navigate between module pages</li>
-      <li>➡ Style the app with Blackbaud Sky UX or custom CSS</li>
+      <li>➡ Add sidebar navigation and Angular routing across all 5 modules</li>
+      <li>➡ Build Dashboard with live summary counts from all APIs</li>
+      <li>➡ Build Treasury, AP, Grants, Budgeting module pages</li>
       <li>➡ Plan Azure deployment — App Service (API) + Static Web Apps (Angular) + Azure SQL</li>
     </ul>
   </div>
@@ -318,6 +319,65 @@
   <div class="section">
     <h2>🎯 Outcome</h2>
     <p class="highlight">First full-stack milestone — Angular frontend calling the .NET API which reads from SQL Server. Real data flowing end-to-end: SQL Server → EF Core → ASP.NET API → HttpClient → Angular table. The entire stack is connected and working.</p>
+  </div>
+</div>
+
+<!-- DAY 5 -->
+<div class="day-card" id="day5">
+  <span class="date-badge">📅 2026-07-13</span>
+  <h2>🖥️ Day 5 — Full Angular App — Dashboard, Navigation, All 5 Module Pages</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Rebuilt app shell — sidebar layout with brand header and nav links, main content area with &lt;router-outlet&gt;</li>
+      <li>✅ Configured Angular Router — 6 routes wired up in app.routes.ts: / → Dashboard, /journal-entries, /treasury, /accounts-payable, /grants, /budgeting</li>
+      <li>✅ Sidebar nav with routerLink and routerLinkActive — active page highlighted automatically</li>
+      <li>✅ Dashboard page — fires 5 parallel API calls on load, displays live record counts as stat cards for all modules</li>
+      <li>✅ Journal Entries page — table with ID, Description, Debit, Credit, Fund, Balanced indicator</li>
+      <li>✅ Treasury page — bank transactions table with Amount, Type, Account, Cleared status</li>
+      <li>✅ Accounts Payable page — invoices table with Vendor, Amount, Due Date, Status</li>
+      <li>✅ Grants page — table with Grant Name, Funder, Total, Spent, Remaining, Overspent badge (class binding)</li>
+      <li>✅ Budgeting page — budget lines table with Department, Category, Budgeted, Actual, Variance, Status</li>
+      <li>✅ All 6 pages are standalone Angular components with their own .html, .css, and .spec.ts files</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Angular Router — Routes array maps URL paths to components; provideRouter() registers it in app.config.ts</li>
+      <li>✔ router-outlet — placeholder in the shell template where the matched route's component is rendered</li>
+      <li>✔ routerLink — replaces href for SPA navigation (no full page reload)</li>
+      <li>✔ routerLinkActive — automatically adds a CSS class when the route is active; [routerLinkActiveOptions]="{exact: true}" prevents / from always matching</li>
+      <li>✔ Parallel API calls in ngOnInit — subscribing to multiple Observables in sequence fetches all data concurrently</li>
+      <li>✔ Component-scoped CSS — each page has its own .css file; styles don't bleed between components</li>
+      <li>✔ Class binding for status badges — [class.overspent]="g.isOverspent" applies a red style when grant is over limit</li>
+      <li>✔ Standalone component architecture — each page imports only what it needs (CommonModule, RouterModule) with no shared NgModule</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ routerLinkActive marked Dashboard as active on every page because "/" matches all routes</li>
+      <li>✅ Fixed with [routerLinkActiveOptions]="{exact: true}" on the Dashboard link</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Add create/approve/pay actions in the UI (POST/PUT calls via ApiService)</li>
+      <li>➡ Add error handling and empty-state messages to all pages</li>
+      <li>➡ Plan Azure deployment — App Service (API) + Static Web Apps (Angular) + Azure SQL</li>
+      <li>➡ Add AI anomaly detection (Story 5.2)</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">FundFlow NXT is now a fully navigable full-stack app — sidebar nav, dashboard with live counts from all 5 APIs, and individual module pages for every controller. The complete stack (Angular → .NET API → EF Core → SQL Server) is working end-to-end across all modules.</p>
   </div>
 </div>
 

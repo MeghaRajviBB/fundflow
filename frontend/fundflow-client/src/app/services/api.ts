@@ -29,4 +29,11 @@ export class Api {
   getBudgets(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/Budgeting`);
   }
+  analyzeEntry(entry: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/JournalEntry/analyze`, entry);
+  }
+
+  scanAnomalies(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/JournalEntry/scan-anomalies`);
+  }
 }
