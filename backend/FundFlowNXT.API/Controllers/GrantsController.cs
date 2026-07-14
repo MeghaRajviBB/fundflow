@@ -42,7 +42,36 @@ namespace FundFlowNXT.API.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new { id = grant.Id }, grant);
         }
+        // PUT update grant
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, Grant updated)
+        {
+            var g = await _context.Grants.FindAsync(id);
+            if (g == null) return NotFound($"Grant {id} not found");
 
+            g.GrantName = updated.GrantName;
+            g.FunderName = updated.FunderName;
+            g.TotalAmount = updated.TotalAmount;
+            g.SpentAmount = updated.SpentAmount;
+            g.StartDate = updated.StartDate;
+            g.EndDate = updated.EndDate;
+            g.Status = updated.Status;
+
+            await _context.SaveChangesAsync();
+            return Ok(g);
+        }
+
+        // DELETE grant
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var g = await _context.Grants.FindAsync(id);
+            if (g == null) return NotFound($"Grant {id} not found");
+
+            _context.Grants.Remove(g);
+            await _context.SaveChangesAsync();
+            return Ok($"Grant {id} deleted");
+        }
         // POST record spending against a grant
         [HttpPost("{id}/spend")]
         public async Task<ActionResult> RecordSpending(int id, [FromBody] decimal amount)

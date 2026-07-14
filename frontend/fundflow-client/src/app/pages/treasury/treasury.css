@@ -59,3 +59,39 @@
   color: #d97706;
   font-weight: 600;
 }
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.add-btn { background: #0d9488; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.form-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; border-left: 4px solid #0d9488; }
+.form-card h3 { color: #0f2645; margin-bottom: 16px; font-size: 16px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid label { display: block; font-size: 13px; color: #475569; margin-bottom: 6px; font-weight: 500; }
+.form-grid input, .form-grid select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+.form-actions { margin-top: 20px; display: flex; gap: 10px; }
+.save-btn { background: #0d9488; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.cancel-btn { background: #e2e8f0; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.actions { display: flex; gap: 8px; }
+.actions button { border: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.actions .edit { background: #dbeafe; color: #2563eb; }
+.actions .delete { background: #fee2e2; color: #dc2626; }
+.bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #eef6f5;
+  border: 1px solid #99f6e4;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+}
+.bulk-info { font-size: 13px; color: #0f766e; font-weight: 600; }
+.bulk-btn {
+  background: #0d9488;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.bulk-btn:disabled { background: #94a3b8; cursor: not-allowed; }

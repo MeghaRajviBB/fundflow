@@ -1,22 +1,72 @@
 <div class="page">
-  <h2>Treasury — Bank Transactions</h2>
-  <p class="subtitle">Bank accounts and transaction clearing</p>
+  <div class="header-row">
+    <div>
+      <h2>Treasury — Bank Transactions</h2>
+      <p class="subtitle">Bank accounts and transaction clearing</p>
+    </div>
+    <button class="add-btn" (click)="openAdd()">+ New Transaction</button>
+  </div>
+
+  <!-- Bulk clear action bar -->
+  <div class="bulk-bar" *ngIf="!loading">
+    <span class="bulk-info">
+      {{ pendingCount }} pending · {{ selectedIds.length }} selected
+    </span>
+    <button class="bulk-btn" (click)="clearSelected()" [disabled]="selectedIds.length === 0 || clearing">
+      {{ clearing ? 'Clearing...' : 'Clear Selected (' + selectedIds.length + ')' }}
+    </button>
+  </div>
+
+  <div *ngIf="showForm" class="form-card">
+    <h3>{{ editingId ? 'Edit Transaction' : 'New Transaction' }}</h3>
+    <div class="form-grid">
+      <div>
+        <label>Description</label>
+        <input [(ngModel)]="txn.description" />
+      </div>
+      <div>
+        <label>Amount (₹)</label>
+        <input type="number" [(ngModel)]="txn.amount" />
+      </div>
+      <div>
+        <label>Type</label>
+        <select [(ngModel)]="txn.type">
+          <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <div>
+        <label>Bank Account</label>
+        <select [(ngModel)]="txn.bankAccount">
+          <option *ngFor="let a of accounts" [value]="a">{{ a }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="save-btn" (click)="save()">{{ editingId ? 'Update' : 'Create' }}</button>
+      <button class="cancel-btn" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
 
   <div *ngIf="loading" class="loading">Loading data from database...</div>
 
   <table *ngIf="!loading" class="data-table">
     <thead>
       <tr>
+        <th></th>
         <th>ID</th>
         <th>Description</th>
         <th>Amount</th>
         <th>Type</th>
         <th>Bank Account</th>
         <th>Cleared</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let t of transactions">
+        <td>
+          <input type="checkbox" *ngIf="!t.isCleared" [checked]="isSelected(t.id)" (change)="toggleSelect(t.id)" />
+        </td>
         <td>{{ t.id }}</td>
         <td>{{ t.description }}</td>
         <td>₹{{ t.amount }}</td>
@@ -26,6 +76,10 @@
           <span [class.cleared]="t.isCleared" [class.uncleared]="!t.isCleared">
             {{ t.isCleared ? 'Cleared' : 'Pending' }}
           </span>
+        </td>
+        <td class="actions">
+          <button class="edit" (click)="openEdit(t)">Edit</button>
+          <button class="delete" (click)="remove(t.id)">Delete</button>
         </td>
       </tr>
     </tbody>

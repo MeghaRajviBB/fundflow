@@ -49,7 +49,36 @@ namespace FundFlowNXT.API.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = entry.Id }, entry);
         }
+        // PUT update an existing entry
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, JournalEntry updated)
+        {
+            var entry = await _context.JournalEntries.FindAsync(id);
+            if (entry == null)
+                return NotFound($"Entry {id} not found");
 
+            entry.Description = updated.Description;
+            entry.DebitAmount = updated.DebitAmount;
+            entry.CreditAmount = updated.CreditAmount;
+            entry.Date = updated.Date;
+            entry.Fund = updated.Fund;
+
+            await _context.SaveChangesAsync();
+            return Ok(entry);
+        }
+
+        // DELETE an entry
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var entry = await _context.JournalEntries.FindAsync(id);
+            if (entry == null)
+                return NotFound($"Entry {id} not found");
+
+            _context.JournalEntries.Remove(entry);
+            await _context.SaveChangesAsync();
+            return Ok($"Entry {id} deleted");
+        }
         // POST analyze a single entry for anomalies (without saving)
         [HttpPost("analyze")]
         public ActionResult Analyze(JournalEntry entry)

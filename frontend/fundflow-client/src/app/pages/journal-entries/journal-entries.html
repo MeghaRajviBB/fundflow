@@ -1,6 +1,40 @@
 <div class="page">
-  <h2>General Ledger — Journal Entries</h2>
-  <p class="subtitle">All financial transactions, with automatic debit = credit validation</p>
+  <div class="header-row">
+    <div>
+      <h2>General Ledger — Journal Entries</h2>
+      <p class="subtitle">All financial transactions, with automatic debit = credit validation</p>
+    </div>
+    <button class="add-btn" (click)="openAddForm()">+ New Entry</button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div *ngIf="showForm" class="form-card">
+    <h3>{{ editingId ? 'Edit Entry' : 'New Entry' }}</h3>
+    <div class="form-grid">
+      <div>
+        <label>Description</label>
+        <input [(ngModel)]="entry.description" placeholder="e.g. Office Supplies" />
+      </div>
+      <div>
+        <label>Fund</label>
+        <select [(ngModel)]="entry.fund">
+          <option *ngFor="let f of funds" [value]="f">{{ f }}</option>
+        </select>
+      </div>
+      <div>
+        <label>Debit Amount (₹)</label>
+        <input type="number" [(ngModel)]="entry.debitAmount" />
+      </div>
+      <div>
+        <label>Credit Amount (₹)</label>
+        <input type="number" [(ngModel)]="entry.creditAmount" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="save-btn" (click)="save()">{{ editingId ? 'Update' : 'Create' }}</button>
+      <button class="cancel-btn" (click)="cancelForm()">Cancel</button>
+    </div>
+  </div>
 
   <div *ngIf="loading" class="loading">Loading data from database...</div>
 
@@ -13,19 +47,24 @@
         <th>Credit</th>
         <th>Fund</th>
         <th>Balanced</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let entry of journalEntries">
-        <td>{{ entry.id }}</td>
-        <td>{{ entry.description }}</td>
-        <td>₹{{ entry.debitAmount }}</td>
-        <td>₹{{ entry.creditAmount }}</td>
-        <td>{{ entry.fund }}</td>
+      <tr *ngFor="let e of journalEntries">
+        <td>{{ e.id }}</td>
+        <td>{{ e.description }}</td>
+        <td>₹{{ e.debitAmount }}</td>
+        <td>₹{{ e.creditAmount }}</td>
+        <td>{{ e.fund }}</td>
         <td>
-          <span [class.balanced]="entry.isBalanced" [class.unbalanced]="!entry.isBalanced">
-            {{ entry.isBalanced ? '✓' : '✗' }}
+          <span [class.balanced]="e.isBalanced" [class.unbalanced]="!e.isBalanced">
+            {{ e.isBalanced ? '✓' : '✗' }}
           </span>
+        </td>
+        <td class="actions">
+          <button class="edit" (click)="openEditForm(e)">Edit</button>
+          <button class="delete" (click)="remove(e.id)">Delete</button>
         </td>
       </tr>
     </tbody>

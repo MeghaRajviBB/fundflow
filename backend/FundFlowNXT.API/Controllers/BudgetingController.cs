@@ -64,5 +64,34 @@ namespace FundFlowNXT.API.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = budget.Id }, budget);
         }
+        // PUT update budget
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, Budget updated)
+        {
+            var b = await _context.Budgets.FindAsync(id);
+            if (b == null) return NotFound($"Budget {id} not found");
+
+            b.Department = updated.Department;
+            b.Category = updated.Category;
+            b.BudgetedAmount = updated.BudgetedAmount;
+            b.ActualAmount = updated.ActualAmount;
+            b.FiscalYear = updated.FiscalYear;
+            b.Quarter = updated.Quarter;
+
+            await _context.SaveChangesAsync();
+            return Ok(b);
+        }
+
+        // DELETE budget
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var b = await _context.Budgets.FindAsync(id);
+            if (b == null) return NotFound($"Budget {id} not found");
+
+            _context.Budgets.Remove(b);
+            await _context.SaveChangesAsync();
+            return Ok($"Budget {id} deleted");
+        }
     }
 }

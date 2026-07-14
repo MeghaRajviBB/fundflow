@@ -42,7 +42,35 @@ namespace FundFlowNXT.API.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = transaction.Id }, transaction);
         }
+        // PUT update transaction
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, BankTransaction updated)
+        {
+            var t = await _context.BankTransactions.FindAsync(id);
+            if (t == null) return NotFound($"Transaction {id} not found");
 
+            t.Description = updated.Description;
+            t.Amount = updated.Amount;
+            t.Date = updated.Date;
+            t.Type = updated.Type;
+            t.IsCleared = updated.IsCleared;
+            t.BankAccount = updated.BankAccount;
+
+            await _context.SaveChangesAsync();
+            return Ok(t);
+        }
+
+        // DELETE transaction
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var t = await _context.BankTransactions.FindAsync(id);
+            if (t == null) return NotFound($"Transaction {id} not found");
+
+            _context.BankTransactions.Remove(t);
+            await _context.SaveChangesAsync();
+            return Ok($"Transaction {id} deleted");
+        }
         // PUT bulk clear
         [HttpPut("bulkclear")]
         public async Task<ActionResult> BulkClear([FromBody] List<int> ids)

@@ -1,6 +1,39 @@
 <div class="page">
-  <h2>Accounts Payable — Invoices</h2>
-  <p class="subtitle">Vendor invoices and approval workflow</p>
+  <div class="header-row">
+    <div>
+      <h2>Accounts Payable — Invoices</h2>
+      <p class="subtitle">Vendor invoices and approval workflow</p>
+    </div>
+    <button class="add-btn" (click)="openAdd()">+ New Invoice</button>
+  </div>
+
+  <div *ngIf="showForm" class="form-card">
+    <h3>{{ editingId ? 'Edit Invoice' : 'New Invoice' }}</h3>
+    <div class="form-grid">
+      <div>
+        <label>Vendor Name</label>
+        <input [(ngModel)]="inv.vendorName" />
+      </div>
+      <div>
+        <label>Description</label>
+        <input [(ngModel)]="inv.description" />
+      </div>
+      <div>
+        <label>Amount (₹)</label>
+        <input type="number" [(ngModel)]="inv.amount" />
+      </div>
+      <div>
+        <label>Status</label>
+        <select [(ngModel)]="inv.status">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="save-btn" (click)="save()">{{ editingId ? 'Update' : 'Create' }}</button>
+      <button class="cancel-btn" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
 
   <div *ngIf="loading" class="loading">Loading data from database...</div>
 
@@ -13,21 +46,24 @@
         <th>Amount</th>
         <th>Due Date</th>
         <th>Status</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let inv of invoices">
-        <td>{{ inv.id }}</td>
-        <td>{{ inv.vendorName }}</td>
-        <td>{{ inv.description }}</td>
-        <td>₹{{ inv.amount }}</td>
-        <td>{{ inv.dueDate | date:'dd MMM yyyy' }}</td>
+      <tr *ngFor="let i of invoices">
+        <td>{{ i.id }}</td>
+        <td>{{ i.vendorName }}</td>
+        <td>{{ i.description }}</td>
+        <td>₹{{ i.amount }}</td>
+        <td>{{ i.dueDate | date:'dd MMM yyyy' }}</td>
         <td>
-          <span class="status" [class.paid]="inv.status === 'Paid'"
-                               [class.approved]="inv.status === 'Approved'"
-                               [class.pending]="inv.status === 'Pending'">
-            {{ inv.status }}
+          <span class="status" [class.paid]="i.status === 'Paid'" [class.approved]="i.status === 'Approved'" [class.pending]="i.status === 'Pending'">
+            {{ i.status }}
           </span>
+        </td>
+        <td class="actions">
+          <button class="edit" (click)="openEdit(i)">Edit</button>
+          <button class="delete" (click)="remove(i.id)">Delete</button>
         </td>
       </tr>
     </tbody>

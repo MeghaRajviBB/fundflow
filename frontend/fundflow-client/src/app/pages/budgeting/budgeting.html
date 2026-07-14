@@ -1,6 +1,43 @@
 <div class="page">
-  <h2>Budgeting — Budget vs Actual</h2>
-  <p class="subtitle">Department budgets and variance tracking</p>
+  <div class="header-row">
+    <div>
+      <h2>Budgeting — Budget vs Actual</h2>
+      <p class="subtitle">Department budgets and variance tracking</p>
+    </div>
+    <button class="add-btn" (click)="openAdd()">+ New Budget Line</button>
+  </div>
+
+  <div *ngIf="showForm" class="form-card">
+    <h3>{{ editingId ? 'Edit Budget Line' : 'New Budget Line' }}</h3>
+    <div class="form-grid">
+      <div>
+        <label>Department</label>
+        <input [(ngModel)]="budget.department" />
+      </div>
+      <div>
+        <label>Category</label>
+        <input [(ngModel)]="budget.category" />
+      </div>
+      <div>
+        <label>Budgeted Amount (₹)</label>
+        <input type="number" [(ngModel)]="budget.budgetedAmount" />
+      </div>
+      <div>
+        <label>Actual Amount (₹)</label>
+        <input type="number" [(ngModel)]="budget.actualAmount" />
+      </div>
+      <div>
+        <label>Quarter</label>
+        <select [(ngModel)]="budget.quarter">
+          <option *ngFor="let q of quarters" [value]="q">{{ q }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="save-btn" (click)="save()">{{ editingId ? 'Update' : 'Create' }}</button>
+      <button class="cancel-btn" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
 
   <div *ngIf="loading" class="loading">Loading data from database...</div>
 
@@ -14,6 +51,7 @@
         <th>Actual</th>
         <th>Variance</th>
         <th>Status</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -28,6 +66,10 @@
           <span class="status" [class.over]="b.isOverBudget" [class.within]="!b.isOverBudget">
             {{ b.isOverBudget ? 'Over Budget' : 'Within Budget' }}
           </span>
+        </td>
+        <td class="actions">
+          <button class="edit" (click)="openEdit(b)">Edit</button>
+          <button class="delete" (click)="remove(b.id)">Delete</button>
         </td>
       </tr>
     </tbody>

@@ -47,7 +47,35 @@ namespace FundFlowNXT.API.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = invoice.Id }, invoice);
         }
+        // PUT update invoice
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, Invoice updated)
+        {
+            var inv = await _context.Invoices.FindAsync(id);
+            if (inv == null) return NotFound($"Invoice {id} not found");
 
+            inv.VendorName = updated.VendorName;
+            inv.Description = updated.Description;
+            inv.Amount = updated.Amount;
+            inv.InvoiceDate = updated.InvoiceDate;
+            inv.DueDate = updated.DueDate;
+            inv.Status = updated.Status;
+
+            await _context.SaveChangesAsync();
+            return Ok(inv);
+        }
+
+        // DELETE invoice
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var inv = await _context.Invoices.FindAsync(id);
+            if (inv == null) return NotFound($"Invoice {id} not found");
+
+            _context.Invoices.Remove(inv);
+            await _context.SaveChangesAsync();
+            return Ok($"Invoice {id} deleted");
+        }
         // PUT approve
         [HttpPut("{id}/approve")]
         public async Task<ActionResult> Approve(int id)

@@ -11,11 +11,18 @@ namespace FundFlowNXT.API.Data
                 return;
 
             // Journal Entries
+            // Journal Entries — mix of clean and problematic (as if imported from a legacy system)
             context.JournalEntries.AddRange(
                 new JournalEntry { Description = "Office Supplies", DebitAmount = 5000, CreditAmount = 5000, Date = DateTime.Now.AddDays(-10), Fund = "Operations Fund" },
                 new JournalEntry { Description = "Donor Contribution", DebitAmount = 100000, CreditAmount = 100000, Date = DateTime.Now.AddDays(-8), Fund = "General Fund" },
-                new JournalEntry { Description = "Education Grant Disbursement", DebitAmount = 50000, CreditAmount = 50000, Date = DateTime.Now.AddDays(-5), Fund = "Education Fund" }
+                new JournalEntry { Description = "Education Grant Disbursement", DebitAmount = 50000, CreditAmount = 50000, Date = DateTime.Now.AddDays(-5), Fund = "Education Fund" },
+
+                // Imported from legacy system — contains errors the AI should catch
+                new JournalEntry { Description = "Legacy import - Q3 adjustment", DebitAmount = 8000, CreditAmount = 6500, Date = DateTime.Now.AddDays(-4), Fund = "Operations Fund" },
+                new JournalEntry { Description = "Restricted fund transfer", DebitAmount = 150000, CreditAmount = 150000, Date = DateTime.Now.AddDays(-3), Fund = "Education Fund" },
+                new JournalEntry { Description = "Migrated placeholder entry", DebitAmount = 0, CreditAmount = 0, Date = DateTime.Now.AddDays(-2), Fund = "General Fund" }
             );
+
 
             // Bank Transactions
             context.BankTransactions.AddRange(

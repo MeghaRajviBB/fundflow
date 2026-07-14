@@ -1,6 +1,43 @@
 <div class="page">
-  <h2>Grants — Restricted Funds</h2>
-  <p class="subtitle">Grant tracking with overspend detection</p>
+  <div class="header-row">
+    <div>
+      <h2>Grants — Restricted Funds</h2>
+      <p class="subtitle">Grant tracking with overspend detection</p>
+    </div>
+    <button class="add-btn" (click)="openAdd()">+ New Grant</button>
+  </div>
+
+  <div *ngIf="showForm" class="form-card">
+    <h3>{{ editingId ? 'Edit Grant' : 'New Grant' }}</h3>
+    <div class="form-grid">
+      <div>
+        <label>Grant Name</label>
+        <input [(ngModel)]="grant.grantName" />
+      </div>
+      <div>
+        <label>Funder Name</label>
+        <input [(ngModel)]="grant.funderName" />
+      </div>
+      <div>
+        <label>Total Amount (₹)</label>
+        <input type="number" [(ngModel)]="grant.totalAmount" />
+      </div>
+      <div>
+        <label>Spent Amount (₹)</label>
+        <input type="number" [(ngModel)]="grant.spentAmount" />
+      </div>
+      <div>
+        <label>Status</label>
+        <select [(ngModel)]="grant.status">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="save-btn" (click)="save()">{{ editingId ? 'Update' : 'Create' }}</button>
+      <button class="cancel-btn" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
 
   <div *ngIf="loading" class="loading">Loading data from database...</div>
 
@@ -14,6 +51,7 @@
         <th>Spent</th>
         <th>Remaining</th>
         <th>Status</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -28,6 +66,10 @@
           <span class="status" [class.overspent]="g.isOverspent" [class.ok]="!g.isOverspent">
             {{ g.isOverspent ? 'Overspent' : 'On Track' }}
           </span>
+        </td>
+        <td class="actions">
+          <button class="edit" (click)="openEdit(g)">Edit</button>
+          <button class="delete" (click)="remove(g.id)">Delete</button>
         </td>
       </tr>
     </tbody>
