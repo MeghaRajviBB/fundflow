@@ -34,6 +34,8 @@
     <li><a href="#day3">Day 3 — 2026-07-09 | Entity Framework Core + SQL Server — Full Database Migration</a></li>
     <li><a href="#day4">Day 4 — 2026-07-09 | Angular Frontend — Live Journal Entries from Database</a></li>
     <li><a href="#day5">Day 5 — 2026-07-13 | Full Angular App — Dashboard, Navigation, All 5 Module Pages</a></li>
+    <li><a href="#day6">Day 6 — 2026-07-14 | AI Anomaly Detection + Full CRUD Across All Modules</a></li>
+    <li><a href="#day7">Day 7 — 2026-07-16 | Learning & Planning — Consolidation + Improvement Roadmap</a></li>
   </ul>
 </div>
 
@@ -54,7 +56,7 @@
     <tr><td>2.2</td><td>Build journal entry list page connected to live API</td><td>✅ Done</td><td><a href="#day4">Day 4</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>4.1</td><td>Set up SQL Server + Entity Framework Core</td><td>✅ Done</td><td><a href="#day3">Day 3</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>5.1</td><td>Deploy to Azure App Service</td><td>⬜ Backlog</td><td>—</td></tr>
-    <tr><td>5.2</td><td>Add AI anomaly detection</td><td>⬜ Backlog</td><td>—</td></tr>
+    <tr><td>5.2</td><td>Add AI anomaly detection</td><td>✅ Done</td><td><a href="#day6">Day 6</a> <span class="day-chip">2026-07-14</span></td></tr>
   </table>
 </div>
 
@@ -368,16 +370,132 @@
   <div class="section">
     <h2>🚀 Next Steps</h2>
     <ul>
-      <li>➡ Add create/approve/pay actions in the UI (POST/PUT calls via ApiService)</li>
-      <li>➡ Add error handling and empty-state messages to all pages</li>
+      <li>➡ Add full CRUD actions (create/edit/delete) across all module pages</li>
+      <li>➡ Add AI anomaly detection service and frontend page (Story 5.2)</li>
       <li>➡ Plan Azure deployment — App Service (API) + Static Web Apps (Angular) + Azure SQL</li>
-      <li>➡ Add AI anomaly detection (Story 5.2)</li>
     </ul>
   </div>
 
   <div class="section">
     <h2>🎯 Outcome</h2>
     <p class="highlight">FundFlow NXT is now a fully navigable full-stack app — sidebar nav, dashboard with live counts from all 5 APIs, and individual module pages for every controller. The complete stack (Angular → .NET API → EF Core → SQL Server) is working end-to-end across all modules.</p>
+  </div>
+</div>
+
+<!-- DAY 6 -->
+<div class="day-card" id="day6">
+  <span class="date-badge">📅 2026-07-14</span>
+  <h2>✨ Day 6 — AI Anomaly Detection + Full CRUD Across All Modules</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today — Part 1: AI Anomaly Detection</h2>
+    <ul>
+      <li>✅ Built AnomalyDetectionService — rule-based engine with 3 checks on journal entries:</li>
+      <li>&nbsp;&nbsp;&nbsp;• High severity — unbalanced entry (debit ≠ credit), reports the exact difference</li>
+      <li>&nbsp;&nbsp;&nbsp;• Medium severity — large transaction (&gt;₹1,00,000) against a donor-restricted fund</li>
+      <li>&nbsp;&nbsp;&nbsp;• Low severity — zero-value entry on both sides (likely data-entry error)</li>
+      <li>✅ AnomalyResult model — HasAnomaly, Severity, Explanation, Recommendation fields</li>
+      <li>✅ Added POST /api/JournalEntry/analyze — analyze a single entry submitted from the UI</li>
+      <li>✅ Added GET /api/JournalEntry/scan — scans all entries in the DB, returns list of anomalies with summary counts</li>
+      <li>✅ Built Anomaly Detection Angular page with two panels:</li>
+      <li>&nbsp;&nbsp;&nbsp;• "Test an Entry" form — description, debit, credit, fund dropdown; calls analyze endpoint</li>
+      <li>&nbsp;&nbsp;&nbsp;• Result card — severity-coloured header (High/Medium/Low/OK), explanation and recommendation text</li>
+      <li>&nbsp;&nbsp;&nbsp;• "Scan Entire Ledger" button — runs scan across all DB entries, shows anomaly table with severity badges</li>
+      <li>✅ Added /anomaly-detection route and nav link to sidebar</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>📌 What I Built Today — Part 2: Full CRUD on All 5 Module Pages</h2>
+    <ul>
+      <li>✅ Added PUT /update and DELETE /{id} endpoints to all 5 controllers (GL, Treasury, AP, Grants, Budgeting)</li>
+      <li>✅ Added create/edit/delete UI to Journal Entries page — inline form with ngModel two-way binding, shared for add and edit modes</li>
+      <li>✅ Added create/edit/delete UI to Treasury, Grants, and Budgeting pages</li>
+      <li>✅ Added approve and pay workflow buttons to Accounts Payable page — calls PUT /{id}/approve and PUT /{id}/pay</li>
+      <li>✅ All forms use FormsModule with [(ngModel)] for two-way data binding</li>
+      <li>✅ Updated ApiService with createJournalEntry, updateJournalEntry, deleteJournalEntry and equivalent methods for all modules</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Service layer pattern — AnomalyDetectionService separates business logic from the controller; controller just calls the service</li>
+      <li>✔ Rule-based AI — explicit if/else rules with severity tiers; real-world finance systems use similar heuristics before ML</li>
+      <li>✔ FormsModule + [(ngModel)] — two-way binding links an input field directly to a component property; changes in either direction sync automatically</li>
+      <li>✔ Shared add/edit form pattern — one form component handles both modes using editingId: null (add) vs editingId: number (edit)</li>
+      <li>✔ DELETE endpoint pattern — FindAsync → Remove → SaveChangesAsync; return 404 if not found</li>
+      <li>✔ PUT endpoint pattern — FindAsync → update individual fields → SaveChangesAsync; avoids overwriting the Id</li>
+      <li>✔ (click) event binding — [disabled]="analyzing" prevents double-submit while a request is in flight</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ Editing a record was overwriting the Id — sending the full object via PUT replaced the primary key</li>
+      <li>✅ Fixed by mapping only the editable fields (Description, Amount, etc.) onto the found entity, never touching Id</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Deploy to Azure — App Service (API) + Static Web Apps (Angular) + Azure SQL</li>
+      <li>➡ Add input validation and user-friendly error messages across forms</li>
+      <li>➡ Polish UI and prepare demo for manager review</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">FundFlow NXT is now feature-complete for the POC — full CRUD across all 5 modules, an AI anomaly detection engine that flags unbalanced entries and restricted-fund violations, and a dedicated analysis page. The app covers everything from data entry to intelligent financial monitoring.</p>
+  </div>
+</div>
+
+<!-- DAY 7 -->
+<div class="day-card" id="day7">
+  <span class="date-badge">📅 2026-07-16</span>
+  <h2>📚 Day 7 — Learning & Planning — Consolidation + Improvement Roadmap</h2>
+
+  <div class="section">
+    <h2>📌 What I Did Today</h2>
+    <ul>
+      <li>📖 No new code — focused on consolidating understanding across the full stack built over Days 1–6</li>
+      <li>📖 Reviewed Angular fundamentals — components, services, routing, two-way binding, Observables</li>
+      <li>📖 Reviewed C# / .NET fundamentals — controllers, EF Core, async/await, dependency injection, migrations</li>
+      <li>📖 Reviewed SQL foundations — how EF Core maps models to tables, what migrations generate, connection strings</li>
+      <li>📖 Reviewed software engineering principles — service layer pattern, separation of concerns, REST conventions</li>
+      <li>🗺️ Reviewed FundFlow NXT against mentor/peer feedback and identified gaps</li>
+      <li>🗺️ Mapped an improvement roadmap for upcoming sessions across three areas:</li>
+      <li>&nbsp;&nbsp;&nbsp;• UI/UX — better styling, empty states, form validation, responsive layout</li>
+      <li>&nbsp;&nbsp;&nbsp;• Auth + Role-Based Access — login flow, protect routes, role-specific views</li>
+      <li>&nbsp;&nbsp;&nbsp;• Code quality — error handling, loading states, cleaner component structure</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Reflections</h2>
+    <ul>
+      <li>✔ The full stack is working end-to-end but the UI needs polish before it reads as a professional product</li>
+      <li>✔ Auth is the most impactful gap — real FinancialEdge NXT has role-based access (viewer vs approver vs admin)</li>
+      <li>✔ Code quality improvements (consistent error handling, loading guards) will make the codebase maintainable</li>
+      <li>✔ Consolidation days are as important as build days — understanding why code works matters as much as making it work</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Implement improvements from the roadmap — start with UI/UX polish and form validation</li>
+      <li>➡ Explore Angular route guards and JWT-based auth for role-based access</li>
+      <li>➡ Deploy to Azure — App Service + Static Web Apps + Azure SQL</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">Consolidated 6 days of full-stack learning into a clear mental model of how Angular, .NET, EF Core, and SQL Server work together. Identified concrete next steps across UI/UX, auth, and code quality — turning ad-hoc POC work into a structured improvement plan.</p>
   </div>
 </div>
 
