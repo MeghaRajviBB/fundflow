@@ -16,6 +16,7 @@ export class Treasury implements OnInit {
 
   showForm = false;
   editingId: number | null = null;
+  confirmingDeleteId: number | null = null;
   types = ['Credit', 'Debit'];
   accounts = ['Main Account', 'Grants Account', 'Reserve Account'];
 
@@ -84,8 +85,19 @@ export class Treasury implements OnInit {
     }
   }
 
-  remove(id: number) {
-    if (!confirm('Delete this transaction?')) return;
-    this.api.deleteTransaction(id).subscribe({ next: () => this.load() });
+  askDelete(id: number) {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete() {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete() {
+    if (this.confirmingDeleteId === null) return;
+    this.api.deleteTransaction(this.confirmingDeleteId).subscribe({
+      next: () => { this.confirmingDeleteId = null; this.load(); },
+      error: () => { this.confirmingDeleteId = null; this.cdr.detectChanges(); }
+    });
   }
 }

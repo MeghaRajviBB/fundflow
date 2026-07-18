@@ -42,6 +42,13 @@
         <p class="text">{{ result.recommendation }}</p>
       </div>
     </div>
+
+    <!-- RIGHT: Empty state (before any analysis) -->
+    <div class="card result-placeholder" *ngIf="!result">
+      <div class="placeholder-icon">🔍</div>
+      <h3>AI results appear here</h3>
+      <p>Enter the details on the left and click <strong>Analyze with AI</strong> to check an entry for accounting anomalies and restricted-fund violations.</p>
+    </div>
   </div>
 
   <!-- SCAN ALL section -->

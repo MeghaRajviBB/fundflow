@@ -16,6 +16,7 @@ export class AccountsPayable implements OnInit {
 
   showForm = false;
   editingId: number | null = null;
+  confirmingDeleteId: number | null = null;
   statuses = ['Pending', 'Approved', 'Paid'];
 
   inv = this.blank();
@@ -54,8 +55,19 @@ export class AccountsPayable implements OnInit {
     }
   }
 
-  remove(id: number) {
-    if (!confirm('Delete this invoice?')) return;
-    this.api.deleteInvoice(id).subscribe({ next: () => this.load() });
+  askDelete(id: number) {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete() {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete() {
+    if (this.confirmingDeleteId === null) return;
+    this.api.deleteInvoice(this.confirmingDeleteId).subscribe({
+      next: () => { this.confirmingDeleteId = null; this.load(); },
+      error: () => { this.confirmingDeleteId = null; this.cdr.detectChanges(); }
+    });
   }
 }

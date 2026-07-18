@@ -1,6 +1,11 @@
 <div class="layout">
-  <aside class="sidebar">
-    <a routerLink="/app" class="brand">
+  <!-- Dimmed backdrop shown only while the drawer is open -->
+  @if (sidebarOpen) {
+    <div class="backdrop" (click)="closeSidebar()"></div>
+  }
+
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <a routerLink="/app" class="brand" (click)="closeSidebar()">
       <div class="brand-mark">FF</div>
       <div class="brand-text">
         <span class="brand-name">FundFlow </span>
@@ -10,19 +15,19 @@
 
     <nav class="nav">
       <span class="nav-section">Overview</span>
-      <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar()">
         <span class="nav-dot"></span> Dashboard
       </a>
 
       <span class="nav-section">Modules</span>
-      <a routerLink="/app/journal-entries" routerLinkActive="active"><span class="nav-dot"></span> General Ledger</a>
-      <a routerLink="/app/treasury" routerLinkActive="active"><span class="nav-dot"></span> Treasury</a>
-      <a routerLink="/app/accounts-payable" routerLinkActive="active"><span class="nav-dot"></span> Accounts Payable</a>
-      <a routerLink="/app/grants" routerLinkActive="active"><span class="nav-dot"></span> Grants</a>
-      <a routerLink="/app/budgeting" routerLinkActive="active"><span class="nav-dot"></span> Budgeting</a>
+      <a routerLink="/app/journal-entries" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> General Ledger</a>
+      <a routerLink="/app/treasury" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Treasury</a>
+      <a routerLink="/app/accounts-payable" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Accounts Payable</a>
+      <a routerLink="/app/grants" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Grants</a>
+      <a routerLink="/app/budgeting" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Budgeting</a>
 
       <span class="nav-section">Intelligence</span>
-      <a routerLink="/app/anomaly-detection" routerLinkActive="active" class="nav-ai"><span class="nav-dot"></span> Anomaly Detection</a>
+      <a routerLink="/app/anomaly-detection" routerLinkActive="active" class="nav-ai" (click)="closeSidebar()"><span class="nav-dot"></span> Anomaly Detection</a>
     </nav>
 
     <div class="sidebar-footer">
@@ -32,7 +37,22 @@
 
   <div class="main-wrap">
     <header class="topbar">
-      <div class="topbar-title">Nonprofit Fund Accounting</div>
+      <div class="topbar-left">
+        <button
+          class="hamburger"
+          [class.is-open]="sidebarOpen"
+          (click)="toggleSidebar()"
+          aria-label="Toggle navigation menu"
+          [attr.aria-expanded]="sidebarOpen">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <a routerLink="/app" class="topbar-brand">
+          <span class="topbar-brand-mark">FF</span>
+          <span class="topbar-brand-name">FundFlow</span>
+        </a>
+      </div>
       <div class="topbar-right">
         <span class="env-pill">Development</span>
       </div>

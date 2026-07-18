@@ -7,6 +7,43 @@
     <button class="add-btn" (click)="openAdd()">+ New Grant</button>
   </div>
 
+  <div *ngIf="loading" class="loading">Loading data from database...</div>
+
+  <table *ngIf="!loading" class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Grant Name</th>
+        <th>Funder</th>
+        <th>Total</th>
+        <th>Spent</th>
+        <th>Remaining</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of grants">
+        <td>{{ g.id }}</td>
+        <td>{{ g.grantName }}</td>
+        <td>{{ g.funderName }}</td>
+        <td>₹{{ g.totalAmount }}</td>
+        <td>₹{{ g.spentAmount }}</td>
+        <td>₹{{ g.remainingBalance }}</td>
+        <td>
+          <span class="status" [class.overspent]="g.isOverspent" [class.ok]="!g.isOverspent">
+            {{ g.isOverspent ? 'Overspent' : 'On Track' }}
+          </span>
+        </td>
+        <td class="actions">
+          <button class="edit" (click)="openEdit(g)">Edit</button>
+          <button class="delete" (click)="askDelete(g.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Add/Edit Form (below the table) -->
   <div *ngIf="showForm" class="form-card">
     <h3>{{ editingId ? 'Edit Grant' : 'New Grant' }}</h3>
     <div class="form-grid">
@@ -39,39 +76,16 @@
     </div>
   </div>
 
-  <div *ngIf="loading" class="loading">Loading data from database...</div>
-
-  <table *ngIf="!loading" class="data-table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Grant Name</th>
-        <th>Funder</th>
-        <th>Total</th>
-        <th>Spent</th>
-        <th>Remaining</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let g of grants">
-        <td>{{ g.id }}</td>
-        <td>{{ g.grantName }}</td>
-        <td>{{ g.funderName }}</td>
-        <td>₹{{ g.totalAmount }}</td>
-        <td>₹{{ g.spentAmount }}</td>
-        <td>₹{{ g.remainingBalance }}</td>
-        <td>
-          <span class="status" [class.overspent]="g.isOverspent" [class.ok]="!g.isOverspent">
-            {{ g.isOverspent ? 'Overspent' : 'On Track' }}
-          </span>
-        </td>
-        <td class="actions">
-          <button class="edit" (click)="openEdit(g)">Edit</button>
-          <button class="delete" (click)="remove(g.id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Delete confirmation modal -->
+  <div class="modal-overlay" *ngIf="confirmingDeleteId !== null" (click)="cancelDelete()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon">🗑</div>
+      <h3 class="modal-title">Are you sure you want to delete this?</h3>
+      <p class="modal-text">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>

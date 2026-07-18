@@ -16,6 +16,7 @@ export class Budgeting implements OnInit {
 
   showForm = false;
   editingId: number | null = null;
+  confirmingDeleteId: number | null = null;
   quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
 
   budget = this.blank();
@@ -54,8 +55,19 @@ export class Budgeting implements OnInit {
     }
   }
 
-  remove(id: number) {
-    if (!confirm('Delete this budget line?')) return;
-    this.api.deleteBudget(id).subscribe({ next: () => this.load() });
+  askDelete(id: number) {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete() {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete() {
+    if (this.confirmingDeleteId === null) return;
+    this.api.deleteBudget(this.confirmingDeleteId).subscribe({
+      next: () => { this.confirmingDeleteId = null; this.load(); },
+      error: () => { this.confirmingDeleteId = null; this.cdr.detectChanges(); }
+    });
   }
 }

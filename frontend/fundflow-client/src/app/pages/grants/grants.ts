@@ -16,6 +16,7 @@ export class Grants implements OnInit {
 
   showForm = false;
   editingId: number | null = null;
+  confirmingDeleteId: number | null = null;
   statuses = ['Active', 'Closed', 'Pending'];
 
   grant = this.blank();
@@ -54,8 +55,19 @@ export class Grants implements OnInit {
     }
   }
 
-  remove(id: number) {
-    if (!confirm('Delete this grant?')) return;
-    this.api.deleteGrant(id).subscribe({ next: () => this.load() });
+  askDelete(id: number) {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete() {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete() {
+    if (this.confirmingDeleteId === null) return;
+    this.api.deleteGrant(this.confirmingDeleteId).subscribe({
+      next: () => { this.confirmingDeleteId = null; this.load(); },
+      error: () => { this.confirmingDeleteId = null; this.cdr.detectChanges(); }
+    });
   }
 }

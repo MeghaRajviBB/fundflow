@@ -16,6 +16,7 @@ export class JournalEntries implements OnInit {
 
   showForm = false;
   editingId: number | null = null;
+  confirmingDeleteId: number | null = null;
   funds = ['Operations Fund', 'General Fund', 'Education Fund', 'Grants Account', 'Restricted Fund'];
 
   entry = this.blankEntry();
@@ -79,11 +80,19 @@ export class JournalEntries implements OnInit {
     }
   }
 
-  remove(id: number) {
-    if (!confirm('Delete this entry?')) return;
-    this.api.deleteJournalEntry(id).subscribe({
-      next: () => this.loadEntries(),
-      error: () => alert('Could not delete')
+  askDelete(id: number) {
+    this.confirmingDeleteId = id;
+  }
+
+  cancelDelete() {
+    this.confirmingDeleteId = null;
+  }
+
+  confirmDelete() {
+    if (this.confirmingDeleteId === null) return;
+    this.api.deleteJournalEntry(this.confirmingDeleteId).subscribe({
+      next: () => { this.confirmingDeleteId = null; this.loadEntries(); },
+      error: () => { this.confirmingDeleteId = null; this.cdr.detectChanges(); alert('Could not delete'); }
     });
   }
 }
