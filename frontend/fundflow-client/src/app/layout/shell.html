@@ -14,20 +14,18 @@
     </a>
 
     <nav class="nav">
-      <span class="nav-section">Overview</span>
-      <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar()">
-        <span class="nav-dot"></span> Dashboard
-      </a>
-
-      <span class="nav-section">Modules</span>
-      <a routerLink="/app/journal-entries" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> General Ledger</a>
-      <a routerLink="/app/treasury" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Treasury</a>
-      <a routerLink="/app/accounts-payable" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Accounts Payable</a>
-      <a routerLink="/app/grants" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Grants</a>
-      <a routerLink="/app/budgeting" routerLinkActive="active" (click)="closeSidebar()"><span class="nav-dot"></span> Budgeting</a>
-
-      <span class="nav-section">Intelligence</span>
-      <a routerLink="/app/anomaly-detection" routerLinkActive="active" class="nav-ai" (click)="closeSidebar()"><span class="nav-dot"></span> Anomaly Detection</a>
+      @for (section of navSections; track section.title) {
+        <span class="nav-section">{{ section.title }}</span>
+        @for (item of section.items; track item.link) {
+          <a [routerLink]="item.link"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: !!item.exact }"
+             [class.nav-ai]="item.ai"
+             (click)="closeSidebar()">
+            <span class="nav-dot"></span> {{ item.label }}
+          </a>
+        }
+      }
     </nav>
 
     <div class="sidebar-footer">

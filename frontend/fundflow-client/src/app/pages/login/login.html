@@ -1,0 +1,33 @@
+<div class="login">
+  <div class="login-card">
+    <a routerLink="/" class="brand" aria-label="FundFlow">
+      <span class="brand-mark">FF</span>
+      <span class="brand-word">FundFlow</span>
+    </a>
+
+    <h1>Sign in to FundFlow</h1>
+    <p class="sub">Nonprofit fund accounting workspace</p>
+
+    <label for="username">Username</label>
+    <input
+      id="username"
+      type="text"
+      [(ngModel)]="name"
+      (keyup.enter)="signIn()"
+      placeholder="e.g. Jordan Smith"
+      autocomplete="off" />
+
+    <label for="role">Role</label>
+    <select id="role" [(ngModel)]="role">
+      <option value="Admin">Admin</option>
+      <option value="Accountant">Accountant</option>
+      <option value="Viewer">Viewer</option>
+    </select>
+
+    <button class="signin-btn" (click)="signIn()" [disabled]="!name.trim()">
+      Sign In
+    </button>
+
+    <p class="hint">Demo sign-in — no password required.</p>
+  </div>
+</div>
