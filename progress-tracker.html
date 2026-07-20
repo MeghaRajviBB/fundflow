@@ -36,6 +36,9 @@
     <li><a href="#day5">Day 5 — 2026-07-13 | Full Angular App — Dashboard, Navigation, All 5 Module Pages</a></li>
     <li><a href="#day6">Day 6 — 2026-07-14 | AI Anomaly Detection + Full CRUD Across All Modules</a></li>
     <li><a href="#day7">Day 7 — 2026-07-16 | Learning & Planning — Consolidation + Improvement Roadmap</a></li>
+    <li><a href="#day8">Day 8 — 2026-07-17 | SaaS Landing Page + App Shell + Routing Restructure</a></li>
+    <li><a href="#day9">Day 9 — 2026-07-18 | UI Polish — Edit Forms, Delete Modal, Full-Width Anomaly Page</a></li>
+    <li><a href="#day10">Day 10 — 2026-07-19 | Frontend Authentication — Login, Auth Service, Route Guards, RBAC</a></li>
   </ul>
 </div>
 
@@ -55,6 +58,8 @@
     <tr><td>2.1</td><td>Create Angular project</td><td>✅ Done</td><td><a href="#day4">Day 4</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>2.2</td><td>Build journal entry list page connected to live API</td><td>✅ Done</td><td><a href="#day4">Day 4</a> <span class="day-chip">2026-07-09</span></td></tr>
     <tr><td>4.1</td><td>Set up SQL Server + Entity Framework Core</td><td>✅ Done</td><td><a href="#day3">Day 3</a> <span class="day-chip">2026-07-09</span></td></tr>
+    <tr><td>2.3</td><td>SaaS landing page + app shell layout</td><td>✅ Done</td><td><a href="#day8">Day 8</a> <span class="day-chip">2026-07-17</span></td></tr>
+    <tr><td>2.4</td><td>Frontend auth — login, route guard, role-based access</td><td>✅ Done</td><td><a href="#day10">Day 10</a> <span class="day-chip">2026-07-19</span></td></tr>
     <tr><td>5.1</td><td>Deploy to Azure App Service</td><td>⬜ Backlog</td><td>—</td></tr>
     <tr><td>5.2</td><td>Add AI anomaly detection</td><td>✅ Done</td><td><a href="#day6">Day 6</a> <span class="day-chip">2026-07-14</span></td></tr>
   </table>
@@ -487,8 +492,9 @@
   <div class="section">
     <h2>🚀 Next Steps</h2>
     <ul>
-      <li>➡ Implement improvements from the roadmap — start with UI/UX polish and form validation</li>
-      <li>➡ Explore Angular route guards and JWT-based auth for role-based access</li>
+      <li>➡ Build a SaaS landing page and restructure app routing under /app</li>
+      <li>➡ Polish UI — move edit forms below tables, style delete modal, fix anomaly page layout</li>
+      <li>➡ Implement Angular route guards and role-based access control</li>
       <li>➡ Deploy to Azure — App Service + Static Web Apps + Azure SQL</li>
     </ul>
   </div>
@@ -496,6 +502,148 @@
   <div class="section">
     <h2>🎯 Outcome</h2>
     <p class="highlight">Consolidated 6 days of full-stack learning into a clear mental model of how Angular, .NET, EF Core, and SQL Server work together. Identified concrete next steps across UI/UX, auth, and code quality — turning ad-hoc POC work into a structured improvement plan.</p>
+  </div>
+</div>
+
+<!-- DAY 8 -->
+<div class="day-card" id="day8">
+  <span class="date-badge">📅 2026-07-17</span>
+  <h2>🌐 Day 8 — SaaS Landing Page + App Shell + Routing Restructure</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Built a full SaaS-style landing page (Landing component) — hero section, feature cards, call-to-action buttons</li>
+      <li>✅ Extracted app shell into a dedicated Shell layout component (layout/shell.ts/html/css) — sidebar + router-outlet separated from app root</li>
+      <li>✅ Restructured Angular routing — flat routes replaced with a 3-level hierarchy:</li>
+      <li>&nbsp;&nbsp;&nbsp;• / → Landing page (public)</li>
+      <li>&nbsp;&nbsp;&nbsp;• /login → Login page (public)</li>
+      <li>&nbsp;&nbsp;&nbsp;• /app → Shell (protected), with all 6 module pages as lazy children</li>
+      <li>&nbsp;&nbsp;&nbsp;• ** → redirects to /</li>
+      <li>✅ AppComponent simplified to just &lt;router-outlet&gt; — no more hardcoded layout in the root</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Nested routes — a parent route can have a component (Shell) that hosts a child router-outlet; children render inside it</li>
+      <li>✔ Layout components — separating the shell (sidebar + nav) from the root lets the landing page be completely layout-free</li>
+      <li>✔ Wildcard route (**) — catches all unmatched URLs; must be last in the routes array</li>
+      <li>✔ Public vs protected route separation — placing all app routes under /app makes it easy to apply a single authGuard at the parent level</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Polish UI across all module pages — edit forms, delete modals, consistent styling</li>
+      <li>➡ Add login page and auth service</li>
+      <li>➡ Wire authGuard to protect the /app parent route</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">FundFlow NXT now has a proper public-facing SaaS landing page at / and a clean app shell under /app. The routing architecture is production-shaped — public pages, a protected app zone, and a layout component that owns the sidebar without polluting the root.</p>
+  </div>
+</div>
+
+<!-- DAY 9 -->
+<div class="day-card" id="day9">
+  <span class="date-badge">📅 2026-07-18</span>
+  <h2>🎨 Day 9 — UI Polish — Edit Forms, Delete Modal, Full-Width Anomaly Page</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Moved edit/create forms below the data table on all 5 module pages — cleaner UX, table stays visible while editing</li>
+      <li>✅ Styled delete confirmation modal — overlay with warning message and confirm/cancel buttons across all pages</li>
+      <li>✅ Anomaly Detection page made full-width — removed sidebar constraints so the scan results table has room to breathe</li>
+      <li>✅ Shell sidebar improvements — active link highlighting, hover states, consistent spacing</li>
+      <li>✅ Consistent card, table, and button styles applied across all pages</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ UX principle — keeping the data table visible while editing lets users reference existing records; hiding it causes context loss</li>
+      <li>✔ CSS overlay modal — position: fixed + full viewport background overlay; z-index stacking to sit above all content</li>
+      <li>✔ Component-scoped layout — a child route can opt out of the shell's constraints by using width: 100% and overriding the parent grid</li>
+      <li>✔ Design consistency — a shared set of card/table/button CSS variables makes the whole app feel like one product</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Add login page with name + role selector</li>
+      <li>➡ Build Auth service and wire route guards to protect /app</li>
+      <li>➡ Implement role-based sidebar — hide nav links the user's role can't access</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">The app went from functional to polished — consistent styles, a proper delete confirmation flow, and a better editing UX across all modules. FundFlow NXT now looks and feels like a real product, not just a developer prototype.</p>
+  </div>
+</div>
+
+<!-- DAY 10 -->
+<div class="day-card" id="day10">
+  <span class="date-badge">📅 2026-07-19</span>
+  <h2>🔐 Day 10 — Frontend Authentication — Login, Auth Service, Route Guards, RBAC</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Built Auth service (services/auth.ts) — holds logged-in User (name + role), exposes login(), logout(), isLoggedIn(), getUser(), getRole()</li>
+      <li>✅ Built Login page — form with name input and role dropdown (Admin / Accountant / Viewer), calls auth.login() then navigates to /app</li>
+      <li>✅ Built authGuard (CanActivateFn) — checks auth.isLoggedIn(); redirects to /login if not authenticated</li>
+      <li>✅ Built roleGuard (CanActivateFn) — reads route.data['roles'], checks user's role against the allowed list; redirects to /app if unauthorized</li>
+      <li>✅ Built roles.ts — single source of truth for RBAC:</li>
+      <li>&nbsp;&nbsp;&nbsp;• Admin — all 7 modules</li>
+      <li>&nbsp;&nbsp;&nbsp;• Accountant — Dashboard, GL, Treasury, Accounts Payable</li>
+      <li>&nbsp;&nbsp;&nbsp;• Viewer — Dashboard and General Ledger only</li>
+      <li>✅ All /app child routes now declare canActivate: [roleGuard] + data: &#123; roles: MODULE_ROLES['...'] &#125;</li>
+      <li>✅ Shell sidebar updated — nav links hidden when the current user's role doesn't have access (canRoleAccess helper)</li>
+      <li>✅ Logout button in sidebar calls auth.logout() and navigates back to /</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ CanActivateFn — Angular's functional guard pattern; inject() replaces constructor DI for guards defined as plain functions</li>
+      <li>✔ route.data — arbitrary metadata attached to a route definition; guards and components can read it via ActivatedRouteSnapshot</li>
+      <li>✔ Single source of truth for permissions — MODULE_ROLES in roles.ts drives both the route guard and the sidebar visibility; change one place, both stay in sync</li>
+      <li>✔ Two-guard pattern — authGuard on the parent (/app) handles "are you logged in?"; roleGuard on each child handles "do you have permission?"; concerns stay separate</li>
+      <li>✔ In-memory auth — no JWT or backend needed for a frontend POC; Auth service holds state in a private field for the session lifetime</li>
+      <li>✔ Hiding vs blocking — hiding a nav link improves UX, but the roleGuard is still needed to block direct URL access; UI alone is never enough</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ Viewer could still navigate to /app/grants by typing the URL directly even though the sidebar link was hidden</li>
+      <li>✅ Fixed by adding roleGuard to every child route — hiding the link is UX, the guard is the actual security layer</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Deploy to Azure — App Service (API) + Static Web Apps (Angular) + Azure SQL</li>
+      <li>➡ Explore backend auth — JWT tokens, [Authorize] attribute on .NET controllers</li>
+      <li>➡ Prepare demo and wrap up POC for manager review</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">FundFlow NXT now has a complete frontend authentication and role-based access control system. Three roles (Admin, Accountant, Viewer) each see a different set of modules. Route guards protect both direct URL access and nav links. The app behaves like a real multi-role enterprise product.</p>
   </div>
 </div>
 
