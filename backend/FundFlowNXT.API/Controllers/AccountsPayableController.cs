@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
-using FundFlowNXT.API.Data;
+using FundFlowNXT.API.Services;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -9,18 +8,18 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class AccountsPayableController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IAccountsPayableService _service;
 
-        public AccountsPayableController(AppDbContext context)
+        public AccountsPayableController(IAccountsPayableService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET all invoices
         [HttpGet]
         public async Task<ActionResult<List<Invoice>>> GetAll()
         {
-            var invoices = await _context.Invoices.ToListAsync();
+            var invoices = await _service.GetAllInvoicesAsync();
             return Ok(invoices);
         }
 
@@ -28,9 +27,7 @@ namespace FundFlowNXT.API.Controllers
         [HttpGet("status/{status}")]
         public async Task<ActionResult<List<Invoice>>> GetByStatus(string status)
         {
-            var filtered = await _context.Invoices
-                .Where(i => i.Status.ToLower() == status.ToLower())
-                .ToListAsync();
+            var filtered = await _service.GetByStatusAsync(status);
 
             if (!filtered.Any())
                 return NotFound($"No invoices found with status: {status}");
@@ -42,26 +39,16 @@ namespace FundFlowNXT.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Invoice>> Create(Invoice invoice)
         {
-            invoice.Status = "Pending";
-            _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetAll), new { id = invoice.Id }, invoice);
+            var created = await _service.CreateInvoiceAsync(invoice);
+            return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
         }
+
         // PUT update invoice
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, Invoice updated)
         {
-            var inv = await _context.Invoices.FindAsync(id);
+            var inv = await _service.UpdateInvoiceAsync(id, updated);
             if (inv == null) return NotFound($"Invoice {id} not found");
-
-            inv.VendorName = updated.VendorName;
-            inv.Description = updated.Description;
-            inv.Amount = updated.Amount;
-            inv.InvoiceDate = updated.InvoiceDate;
-            inv.DueDate = updated.DueDate;
-            inv.Status = updated.Status;
-
-            await _context.SaveChangesAsync();
             return Ok(inv);
         }
 
@@ -69,60 +56,50 @@ namespace FundFlowNXT.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var inv = await _context.Invoices.FindAsync(id);
-            if (inv == null) return NotFound($"Invoice {id} not found");
-
-            _context.Invoices.Remove(inv);
-            await _context.SaveChangesAsync();
+            var deleted = await _service.DeleteInvoiceAsync(id);
+            if (!deleted) return NotFound($"Invoice {id} not found");
             return Ok($"Invoice {id} deleted");
         }
+
         // PUT approve
         [HttpPut("{id}/approve")]
         public async Task<ActionResult> Approve(int id)
         {
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice == null)
-                return NotFound($"Invoice {id} not found");
-
-            if (invoice.Status == "Paid")
-                return BadRequest("Invoice is already paid");
-
-            invoice.Status = "Approved";
-            await _context.SaveChangesAsync();
-            return Ok($"Invoice {id} approved successfully");
+            try
+            {
+                var invoice = await _service.ApproveInvoiceAsync(id);
+                if (invoice == null)
+                    return NotFound($"Invoice {id} not found");
+                return Ok($"Invoice {id} approved successfully");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT pay
         [HttpPut("{id}/pay")]
         public async Task<ActionResult> Pay(int id)
         {
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice == null)
-                return NotFound($"Invoice {id} not found");
-
-            if (invoice.Status != "Approved")
-                return BadRequest("Invoice must be approved before payment");
-
-            invoice.Status = "Paid";
-            await _context.SaveChangesAsync();
-            return Ok($"Invoice {id} marked as paid");
+            try
+            {
+                var invoice = await _service.PayInvoiceAsync(id);
+                if (invoice == null)
+                    return NotFound($"Invoice {id} not found");
+                return Ok($"Invoice {id} marked as paid");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET aging report
         [HttpGet("aging")]
         public async Task<ActionResult> GetAgingReport()
         {
-            var invoices = await _context.Invoices.ToListAsync();
-            var report = new
-            {
-                TotalInvoices = invoices.Count,
-                TotalPending = invoices.Count(i => i.Status == "Pending"),
-                TotalApproved = invoices.Count(i => i.Status == "Approved"),
-                TotalPaid = invoices.Count(i => i.Status == "Paid"),
-                TotalAmountPending = invoices
-                    .Where(i => i.Status != "Paid")
-                    .Sum(i => i.Amount)
-            };
+            var report = await _service.GetAgingReportAsync();
             return Ok(report);
         }
     }

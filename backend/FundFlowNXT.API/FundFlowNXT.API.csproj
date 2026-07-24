@@ -16,4 +16,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\NewFolder1\" />
+    <Folder Include="Data\NewFolder\" />
+  </ItemGroup>
+
 </Project>

@@ -39,6 +39,8 @@
     <li><a href="#day8">Day 8 — 2026-07-17 | SaaS Landing Page + App Shell + Routing Restructure</a></li>
     <li><a href="#day9">Day 9 — 2026-07-18 | UI Polish — Edit Forms, Delete Modal, Full-Width Anomaly Page</a></li>
     <li><a href="#day10">Day 10 — 2026-07-19 | Frontend Authentication — Login, Auth Service, Route Guards, RBAC</a></li>
+    <li><a href="#day11">Day 11 — 2026-07-21 | Learning — Azure Fundamentals + Deployment Plan for FundFlow</a></li>
+    <li><a href="#day12">Day 12 — 2026-07-22 | Backend Refactor — Repository + Service Layer for Grants Module</a></li>
   </ul>
 </div>
 
@@ -644,6 +646,123 @@
   <div class="section">
     <h2>🎯 Outcome</h2>
     <p class="highlight">FundFlow NXT now has a complete frontend authentication and role-based access control system. Three roles (Admin, Accountant, Viewer) each see a different set of modules. Route guards protect both direct URL access and nav links. The app behaves like a real multi-role enterprise product.</p>
+  </div>
+</div>
+
+<!-- DAY 11 -->
+<div class="day-card" id="day11">
+  <span class="date-badge">📅 2026-07-21</span>
+  <h2>☁️ Day 11 — Learning — Azure Fundamentals + Deployment Plan for FundFlow</h2>
+
+  <div class="section">
+    <h2>📌 What I Did Today</h2>
+    <ul>
+      <li>📖 No new code — spent the day learning Azure fundamentals (AZ-900 level) to prepare for deploying FundFlow NXT</li>
+      <li>📖 Cloud concepts — IaaS vs PaaS vs SaaS, and why FundFlow is a PaaS candidate (managed hosting, no VM upkeep)</li>
+      <li>📖 Cloud benefits — scalability, elasticity, high availability, disaster recovery, and pay-as-you-go economics</li>
+      <li>📖 Azure architecture — regions, availability zones, resource groups, subscriptions, and management groups</li>
+      <li>📖 Core compute + data services — App Service, Azure SQL Database, Static Web Apps, Blob Storage</li>
+      <li>📖 Identity + security — Microsoft Entra ID (formerly Azure AD), role-based access control (RBAC), defense in depth</li>
+      <li>📖 Cost + governance — Azure Pricing Calculator, free tier, Cost Management, and tags for tracking spend</li>
+      <li>📖 Management tools — Azure Portal, Azure CLI, and infrastructure-as-code with ARM / Bicep</li>
+      <li>🗺️ Mapped each FundFlow tier to the Azure service that would host it</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ PaaS vs IaaS — App Service (PaaS) runs the .NET API without managing the OS or web server; IaaS (VMs) would mean patching and scaling by hand</li>
+      <li>✔ Resource groups — a logical container to hold all FundFlow resources so they deploy, manage, and delete as one unit</li>
+      <li>✔ Regions & availability zones — pick a region close to users; zones give redundancy inside a region for high availability</li>
+      <li>✔ Azure SQL Database — a fully managed version of SQL Server; the LocalDB used in dev maps directly to it with just a connection-string swap</li>
+      <li>✔ Static Web Apps — purpose-built to host SPA frontends like the Angular client, with a global CDN and free SSL</li>
+      <li>✔ Microsoft Entra ID + RBAC — the cloud equivalent of the role-based access already built in the frontend; the natural next step for real auth</li>
+      <li>✔ Shared responsibility model — with PaaS, Azure secures the platform while I stay responsible for the app, its data, and access control</li>
+      <li>✔ Cost awareness — start on free/low tiers for a POC and use the Pricing Calculator to estimate before committing</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🗺️ FundFlow → Azure Deployment Mapping</h2>
+    <table>
+      <tr><th>FundFlow Tier</th><th>Azure Service</th><th>Why</th></tr>
+      <tr><td>.NET Web API (backend)</td><td>Azure App Service</td><td>Managed PaaS hosting for the ASP.NET Core API — no server maintenance</td></tr>
+      <tr><td>Angular client (frontend)</td><td>Azure Static Web Apps</td><td>Built for SPAs — global CDN, free SSL, simple CI/CD from GitHub</td></tr>
+      <tr><td>SQL Server database</td><td>Azure SQL Database</td><td>Managed SQL — swap the connection string, keep EF Core migrations</td></tr>
+      <tr><td>All resources</td><td>Resource Group</td><td>Group everything under one container for unified management</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Create an Azure resource group and provision an App Service for the .NET API (Story 5.1)</li>
+      <li>➡ Provision an Azure SQL Database and repoint the connection string; run EF Core migrations against it</li>
+      <li>➡ Deploy the Angular client to Azure Static Web Apps and wire it to the hosted API</li>
+      <li>➡ Explore Microsoft Entra ID for real backend auth beyond the in-memory frontend POC</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">Built a solid mental model of Azure fundamentals and turned the long-standing "Deploy to Azure" backlog item into a concrete plan — each FundFlow tier now mapped to the Azure service that will host it. Ready to move from local development to a real cloud deployment.</p>
+  </div>
+</div>
+
+<!-- DAY 12 -->
+<div class="day-card" id="day12">
+  <span class="date-badge">📅 2026-07-22</span>
+  <h2>🏗️ Day 12 — Backend Refactor — Repository + Service Layer for Grants Module</h2>
+
+  <div class="section">
+    <h2>📌 What I Built Today</h2>
+    <ul>
+      <li>✅ Refactored the Grants module from a fat controller into a clean 3-layer architecture: Controller → Service → Repository</li>
+      <li>✅ Built IGrantRepository interface — defines the data-access contract: GetAllAsync, GetByIdAsync, AddAsync, UpdateAsync, DeleteAsync</li>
+      <li>✅ Built GrantRepository — the only class that touches AppDbContext / EF Core; all Grant SQL access now lives here</li>
+      <li>✅ Built IGrantService interface — defines the business-logic contract, including GetSummaryAsync for aggregated totals</li>
+      <li>✅ Built GrantService — holds business rules, calls the repository for data; enforces "spent amount cannot exceed total" on create by throwing InvalidOperationException</li>
+      <li>✅ GetSummaryAsync — aggregates total/active/overspent counts and funding/spent/remaining sums via LINQ</li>
+      <li>✅ Slimmed GrantsController down to just depend on IGrantService — no more direct DbContext access; catches the business-rule exception and returns BadRequest</li>
+      <li>✅ Registered both interfaces with their implementations as scoped services in Program.cs (IGrantRepository → GrantRepository, IGrantService → GrantService)</li>
+      <li>✅ Controller endpoints returned proper REST responses — CreatedAtAction on POST, NotFound on missing id, Ok on success</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Key Learnings</h2>
+    <ul>
+      <li>✔ Repository pattern — isolates all data access behind an interface; the rest of the app never sees EF Core or DbContext directly</li>
+      <li>✔ Service layer — business rules (validation, aggregation) live in the service, not the controller; the controller only handles HTTP concerns</li>
+      <li>✔ Separation of concerns — Controller (HTTP) → Service (rules) → Repository (data): each layer has one job and one reason to change</li>
+      <li>✔ Program against interfaces — controllers depend on IGrantService, not the concrete class; the implementation can be swapped without touching the controller</li>
+      <li>✔ DI with interfaces — AddScoped&lt;IGrantService, GrantService&gt;() tells the container which implementation to inject when an interface is requested</li>
+      <li>✔ Exceptions for business rules — the service throws InvalidOperationException; the controller catches it and translates it to a 400 BadRequest, keeping rules out of the HTTP layer</li>
+      <li>✔ Testability — because the service depends on IGrantRepository, the repo can be mocked in a unit test without a real database</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Challenges Faced</h2>
+    <ul>
+      <li>❌ First instinct was to put the "spent cannot exceed total" check in the controller — but that mixes business rules into the HTTP layer</li>
+      <li>✅ Moved the rule into GrantService as a thrown exception; the controller just catches it and maps it to BadRequest — rules stay where they belong</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Next Steps</h2>
+    <ul>
+      <li>➡ Apply the same repository + service pattern to the other 4 modules (GL, Treasury, AP, Budgeting)</li>
+      <li>➡ Add unit tests for GrantService now that the repository can be mocked</li>
+      <li>➡ Deploy to Azure — App Service (API) + Static Web Apps (Angular) + Azure SQL (per Day 11 plan)</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Outcome</h2>
+    <p class="highlight">Turned the Grants module into a properly layered backend — Controller → Service → Repository, each behind an interface and wired through dependency injection. Business rules now live in the service, data access is isolated in the repository, and the code is finally unit-testable. This is the "code quality" item from the Day 7 roadmap made real, and the template for refactoring the remaining four modules.</p>
   </div>
 </div>
 

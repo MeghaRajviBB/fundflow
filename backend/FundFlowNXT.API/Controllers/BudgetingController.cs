@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
-using FundFlowNXT.API.Data;
+using FundFlowNXT.API.Services;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -9,18 +8,18 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class BudgetingController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IBudgetService _service;
 
-        public BudgetingController(AppDbContext context)
+        public BudgetingController(IBudgetService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET all budgets
         [HttpGet]
         public async Task<ActionResult<List<Budget>>> GetAll()
         {
-            var budgets = await _context.Budgets.ToListAsync();
+            var budgets = await _service.GetAllBudgetsAsync();
             return Ok(budgets);
         }
 
@@ -28,16 +27,7 @@ namespace FundFlowNXT.API.Controllers
         [HttpGet("comparison")]
         public async Task<ActionResult> GetComparison()
         {
-            var budgets = await _context.Budgets.ToListAsync();
-            var comparison = budgets.Select(b => new
-            {
-                b.Department,
-                b.Category,
-                b.BudgetedAmount,
-                b.ActualAmount,
-                Variance = b.BudgetedAmount - b.ActualAmount,
-                Status = b.ActualAmount > b.BudgetedAmount ? "Over Budget" : "Within Budget"
-            }).ToList();
+            var comparison = await _service.GetComparisonAsync();
             return Ok(comparison);
         }
 
@@ -45,40 +35,24 @@ namespace FundFlowNXT.API.Controllers
         [HttpGet("summary")]
         public async Task<ActionResult> GetSummary()
         {
-            var budgets = await _context.Budgets.ToListAsync();
-            return Ok(new
-            {
-                TotalBudgeted = budgets.Sum(b => b.BudgetedAmount),
-                TotalActual = budgets.Sum(b => b.ActualAmount),
-                TotalVariance = budgets.Sum(b => b.BudgetedAmount - b.ActualAmount),
-                DepartmentsOverBudget = budgets.Count(b => b.ActualAmount > b.BudgetedAmount),
-                DepartmentsWithinBudget = budgets.Count(b => b.ActualAmount <= b.BudgetedAmount)
-            });
+            var summary = await _service.GetSummaryAsync();
+            return Ok(summary);
         }
 
         // POST create budget line
         [HttpPost]
         public async Task<ActionResult<Budget>> Create(Budget budget)
         {
-            _context.Budgets.Add(budget);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetAll), new { id = budget.Id }, budget);
+            var created = await _service.CreateBudgetAsync(budget);
+            return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
         }
+
         // PUT update budget
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, Budget updated)
         {
-            var b = await _context.Budgets.FindAsync(id);
+            var b = await _service.UpdateBudgetAsync(id, updated);
             if (b == null) return NotFound($"Budget {id} not found");
-
-            b.Department = updated.Department;
-            b.Category = updated.Category;
-            b.BudgetedAmount = updated.BudgetedAmount;
-            b.ActualAmount = updated.ActualAmount;
-            b.FiscalYear = updated.FiscalYear;
-            b.Quarter = updated.Quarter;
-
-            await _context.SaveChangesAsync();
             return Ok(b);
         }
 
@@ -86,11 +60,8 @@ namespace FundFlowNXT.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var b = await _context.Budgets.FindAsync(id);
-            if (b == null) return NotFound($"Budget {id} not found");
-
-            _context.Budgets.Remove(b);
-            await _context.SaveChangesAsync();
+            var deleted = await _service.DeleteBudgetAsync(id);
+            if (!deleted) return NotFound($"Budget {id} not found");
             return Ok($"Budget {id} deleted");
         }
     }

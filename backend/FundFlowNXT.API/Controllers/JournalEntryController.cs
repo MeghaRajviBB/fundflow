@@ -1,8 +1,6 @@
 ﻿using FundFlowNXT.API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using FundFlowNXT.API.Models;
-using FundFlowNXT.API.Data;
 
 namespace FundFlowNXT.API.Controllers
 {
@@ -10,20 +8,18 @@ namespace FundFlowNXT.API.Controllers
     [Route("api/[controller]")]
     public class JournalEntryController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly AnomalyDetectionService _anomalyService;
+        private readonly IJournalEntryService _service;
 
-        public JournalEntryController(AppDbContext context, AnomalyDetectionService anomalyService)
+        public JournalEntryController(IJournalEntryService service)
         {
-            _context = context;
-            _anomalyService = anomalyService;
+            _service = service;
         }
 
         // GET all journal entries
         [HttpGet]
         public async Task<ActionResult<List<JournalEntry>>> GetAll()
         {
-            var entries = await _context.JournalEntries.ToListAsync();
+            var entries = await _service.GetAllEntriesAsync();
             return Ok(entries);
         }
 
@@ -31,7 +27,7 @@ namespace FundFlowNXT.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<JournalEntry>> GetById(int id)
         {
-            var entry = await _context.JournalEntries.FindAsync(id);
+            var entry = await _service.GetEntryByIdAsync(id);
             if (entry == null)
                 return NotFound();
             return Ok(entry);
@@ -41,29 +37,24 @@ namespace FundFlowNXT.API.Controllers
         [HttpPost]
         public async Task<ActionResult<JournalEntry>> Create(JournalEntry entry)
         {
-            if (entry.DebitAmount != entry.CreditAmount)
-                return BadRequest("Entry is not balanced. Debit must equal Credit.");
-
-            _context.JournalEntries.Add(entry);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new { id = entry.Id }, entry);
+            try
+            {
+                var created = await _service.CreateEntryAsync(entry);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         // PUT update an existing entry
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, JournalEntry updated)
         {
-            var entry = await _context.JournalEntries.FindAsync(id);
+            var entry = await _service.UpdateEntryAsync(id, updated);
             if (entry == null)
                 return NotFound($"Entry {id} not found");
-
-            entry.Description = updated.Description;
-            entry.DebitAmount = updated.DebitAmount;
-            entry.CreditAmount = updated.CreditAmount;
-            entry.Date = updated.Date;
-            entry.Fund = updated.Fund;
-
-            await _context.SaveChangesAsync();
             return Ok(entry);
         }
 
@@ -71,19 +62,17 @@ namespace FundFlowNXT.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var entry = await _context.JournalEntries.FindAsync(id);
-            if (entry == null)
+            var deleted = await _service.DeleteEntryAsync(id);
+            if (!deleted)
                 return NotFound($"Entry {id} not found");
-
-            _context.JournalEntries.Remove(entry);
-            await _context.SaveChangesAsync();
             return Ok($"Entry {id} deleted");
         }
+
         // POST analyze a single entry for anomalies (without saving)
         [HttpPost("analyze")]
         public ActionResult Analyze(JournalEntry entry)
         {
-            var result = _anomalyService.AnalyzeJournalEntry(entry);
+            var result = _service.AnalyzeEntry(entry);
             return Ok(result);
         }
 
@@ -91,34 +80,8 @@ namespace FundFlowNXT.API.Controllers
         [HttpGet("scan-anomalies")]
         public async Task<ActionResult> ScanAnomalies()
         {
-            var entries = await _context.JournalEntries.ToListAsync();
-            var flagged = new List<object>();
-
-            foreach (var entry in entries)
-            {
-                var result = _anomalyService.AnalyzeJournalEntry(entry);
-                if (result.HasAnomaly)
-                {
-                    flagged.Add(new
-                    {
-                        entry.Id,
-                        entry.Description,
-                        entry.Fund,
-                        entry.DebitAmount,
-                        entry.CreditAmount,
-                        result.Severity,
-                        result.Explanation,
-                        result.Recommendation
-                    });
-                }
-            }
-
-            return Ok(new
-            {
-                TotalScanned = entries.Count,
-                AnomaliesFound = flagged.Count,
-                Anomalies = flagged
-            });
+            var result = await _service.ScanAnomaliesAsync();
+            return Ok(result);
         }
     }
 }
